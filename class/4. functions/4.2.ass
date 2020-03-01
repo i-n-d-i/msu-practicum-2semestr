@@ -1,0 +1,16 @@
+%include "io.inc"
+;посчитать сумму 20 и 30 и записать в регистр eax
+section .text
+plus:
+    mov eax, [esp + 4]                ;eax = 30
+    add eax, [esp + 8]                ;eax += 20
+    ret
+global CMAIN
+CMAIN:
+    push dword 20                     ;загрузить параметры в стек
+    push dword 30
+    call plus
+    add esp, 8                        ;очистить стек от параметров
+    PRINT_UDEC 4, eax
+    xor eax, eax
+    ret

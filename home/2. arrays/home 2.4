@@ -1,0 +1,42 @@
+%include "io.inc"
+;дано n, 1<=n<=100, далее n знаковых 4-байтовых чисел. вывести номера всех позиций
+;на которых встречается максимальный элемент
+section .bss
+    n resb 1
+    a resd 100
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [n]                          ;get n
+    mov ebx, 0
+    movzx ecx, byte [n]                   
+    GET_DEC 4, [a + 4 * ebx]                 ;считывание первого элемента массива
+    mov edx, [a + 4 * ebx]                   ;max = a[0]
+    dec ecx
+find_max:  
+    inc ebx                                  ;ebx++
+    GET_DEC 4, [a + 4 * ebx]                 ;считывание остальных элементов массива
+    cmp [a + 4 * ebx], edx
+    jg new_max                               ;if a[i] > max    goto new_max
+    loop find_max
+    jmp M
+new_max: 
+    mov edx, [a + 4 * ebx]                                
+    loop find_max      
+M:  mov ebx, 0
+    movzx ecx, byte [n]
+compare:  
+    cmp edx, [a + 4 * ebx]
+    je print                                 ;if(edx == a[i])  goto print
+    inc ebx
+    loop compare
+    jmp finish
+print: 
+    PRINT_UDEC 4, ebx
+    PRINT_CHAR ' '
+    inc ebx
+    dec ecx
+    jnz compare     
+finish: 
+    xor eax, eax
+    ret

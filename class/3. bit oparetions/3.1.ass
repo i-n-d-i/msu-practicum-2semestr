@@ -1,0 +1,14 @@
+%include "io.inc"
+;вывести степени двойки до 128
+section .text
+global CMAIN
+CMAIN:
+    mov al, 1                  ;al = 1
+    mov ecx, 8                 ;n = 8
+M:  PRINT_UDEC 1, al   
+    PRINT_CHAR ' ' 
+    shl al, 1                  ;al *= 2
+    dec ecx                    ;n--
+    jnz M                      ;if(n != 0)    goto M
+    xor eax, eax
+    ret

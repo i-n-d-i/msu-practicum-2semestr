@@ -1,0 +1,17 @@
+%include "io.inc"
+;даны два байтовых б/зн числа. найти их НОД с помощью алгоритма Евклида
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, ax
+    GET_UDEC 2, bx
+A:  mov dx, 0
+    div bx      ;ax = dx:ax / bx    dx = ...%...
+    cmp dx, 0   
+    je F        ;if(dx == 0)   goto F
+    mov ax, bx  ;ax = bx
+    mov bx, dx  ;bx = dx
+    jmp A
+F:  PRINT_UDEC 2,bx 
+    xor eax, eax
+    ret

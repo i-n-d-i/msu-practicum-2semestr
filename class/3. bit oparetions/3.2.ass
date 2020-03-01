@@ -1,0 +1,26 @@
+%include "io.inc"
+;вывести все четные элементы массива
+section .bss
+    n resb 1
+    a resw 50
+    
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [n]               ;get n
+    xor ebx, ebx                  ;ebx = 0
+    movzx ecx, byte [n]
+K:  GET_DEC 2, [a + 2 * ebx]      ;считывание массива
+    inc ebx
+    loop K
+    xor ebx, ebx       
+    movzx ecx, byte [n]
+L:  test byte [a + 2 * ebx], 1    ;проверка на четность
+    jnz M
+    PRINT_DEC 2, [a + 2 * ebx]
+    PRINT_CHAR ' '
+M:  inc ebx
+    dec ecx
+    jnz L
+    xor eax, eax
+    ret

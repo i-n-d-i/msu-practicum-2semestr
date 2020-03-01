@@ -1,0 +1,50 @@
+%include "io.inc"
+;дано n,m<=100. заполнить двойной массив m*n единицами и нулями в шахматном 
+;порядке и вывести его
+
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, ch          ;get n  
+    GET_UDEC 1, cl          ;get m  
+new.string: 
+    mov al, 1 
+    mov bh, ch    
+    cmp cl, 0     
+    je finish               ;if(m == 0)   goto finish
+A:  cmp bh, 0
+    je C                    ;if(n == 0)   goto C
+    PRINT_UDEC 1, al
+    PRINT_CHAR ' '
+    dec bh                  ;n--
+    cmp al, 0
+    je B
+    mov al, 0
+    jmp A
+B:  mov al, 1
+    jmp A
+C:  dec cl                  ;m--
+    NEWLINE
+    jz finish               ;if(m == 0)   goto finish
+    mov al, 0
+new.string2:
+    mov bh, ch    
+    cmp cl, 0     
+    je finish               ;if(m == 0)   goto finish
+M:  cmp bh, 0
+    je D                    ;if(n == 0)   goto D
+    PRINT_UDEC 1, al
+    PRINT_CHAR ' '
+    dec bh                  ;n--
+    cmp al, 0
+    je E
+    mov al, 0
+    jmp M
+E:  mov al, 1
+    jmp M
+D:  dec cl                  ;m--
+    NEWLINE
+    jnz new.string          ;if(m != 0)   goto new.string
+finish:  
+    xor eax, eax
+    ret

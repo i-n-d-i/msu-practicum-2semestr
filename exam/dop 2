@@ -1,0 +1,30 @@
+%include "io.inc"
+;дано число n, 1 <= n <= 27. вывести все трехзначные числа с суммой цифр n
+section .bss
+    sum resd 1
+    digit resd 1
+    
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, [digit]                    ;n
+    mov ebx, 100
+   
+F:  mov dword [sum], 0
+    mov ecx, 10
+    mov eax, ebx
+A:  mov edx, 0
+    div ecx
+    add [sum], edx
+    cmp eax, 0
+    jne A
+    mov ecx, [digit] 
+    cmp [sum], ecx
+    jne D
+    PRINT_UDEC 4, ebx
+    NEWLINE
+D:  inc ebx
+    cmp ebx, 1000   
+    jne F 
+    xor eax, eax
+    ret

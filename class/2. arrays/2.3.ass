@@ -1,0 +1,37 @@
+%include "io.inc"
+;вывести матрицу n * n
+section .bss
+    a resw 3 * 3
+
+section .text
+global CMAIN
+CMAIN:
+    mov edx, 3              ;внешний цикл для строк  
+    mov eax, 0              ;строки  i = 0
+.input:
+    mov ecx, 3              ;внутренний цикл для столбцов
+    mov ebx, 0              ;столбцы j = 0
+.inner_input:
+    GET_DEC 2, [a + eax + 2 * ebx]  
+    inc ebx                 ;j++    
+    loop .inner_input
+    add eax, 6              ;i += 6     
+    dec edx                 ;eax--     
+    jnz .input              ;if(eax != 0)   goto .input
+    mov edx, 3      
+    mov eax, 0              ;i = 0            
+.output:
+    mov ecx, 3
+    mov ebx, 0              ;j = 0
+.print:  
+    PRINT_DEC 2, [a + eax + 2 * ebx]
+    PRINT_CHAR ' '
+    inc ebx
+    dec ecx
+    jnz .print
+    NEWLINE
+    add eax, 6
+    dec edx
+    jnz .output
+    xor eax, eax
+    ret

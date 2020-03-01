@@ -1,0 +1,17 @@
+%include "io.inc"
+;сумма чисел от 1 до n
+section .text
+sum:
+    xor eax, eax                ;eax = 0
+L:  add eax, ecx
+    loop L
+    ret
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx             ;get n
+    push ecx                    ;записать в стек число n
+    call sum
+    add esp, 4                  ;очистить стек
+    PRINT_UDEC 4, eax
+    xor eax, eax
+    ret

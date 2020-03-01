@@ -1,0 +1,199 @@
+%include "io.inc"
+
+NULL equ 0
+heap_size equ 100
+
+struc node
+    elem resb 1
+    next resd 1
+endstruc
+
+section .bss
+    heap resb heap_size * node_size
+    heap_ptr resd 1
+    
+section .text
+
+;инициализация кучи
+init_heap:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+    
+    mov dword [heap_ptr], heap
+    mov eax, [heap_ptr]
+    mov ecx, heap_size - 1
+L:  mov ebx, eax
+    add ebx, node_size
+    mov [eax + next], ebx
+    add eax, node_size
+    loop L
+    
+    mov [eax + next], dword NULL
+    
+    pop ecx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+;создать новое звено списка
+new:
+    push ebp
+    mov ebp, esp
+    push eax
+    
+    mov edi, [heap_ptr]
+    cmp edi, NULL
+    je .empty
+    mov eax, [edi + next]
+    mov [heap_ptr], eax
+    mov [edi + next], dword NULL
+    jmp .finish
+.empty:
+    PRINT_STRING 'HEAP IS EMPTY'
+.finish:
+    pop eax
+    mov ebp, esp
+    pop ebp
+    ret  
+
+;распечатать список
+print_list:
+    push ebp
+    mov ebp, esp
+    push eax
+    
+    mov eax, [ebp + 8]             ;head
+M:  cmp eax, NULL
+    je .finish
+    PRINT_UDEC 1, [eax + elem]
+    PRINT_CHAR ' '
+    mov eax, [eax + next]
+    jmp M
+.finish:
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+;считывание списка
+read_list:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push edx
+    
+    mov eax, NULL
+    GET_UDEC 1, bl
+    cmp bl, 0
+    je finish
+    call new
+    mov [edi + elem], bl
+    mov eax, edi
+    mov edx, eax
+K:  GET_UDEC 1, bl
+    cmp bl, 0
+    je finish 
+    call new
+    cmp edi, NULL
+    jne .L
+    PRINT_STRING 'Can not create list'
+    jmp finish
+.L: mov [edi + elem], bl
+    mov ebx, edi
+    mov [edx + next], ebx
+    mov edx, ebx
+    jmp K
+finish:
+    pop edx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+;вставить элемент в начало списка    
+push_head:
+    push ebp
+    mov ebp, esp
+    push eax
+    push edx
+    
+    mov eax, [ebp + 8]                  ;elem
+    mov edx, [ebp + 12]                  ;head
+    call new
+    cmp edi, NULL
+    je .error
+    mov [edi + elem], al
+    mov [edi + next], edx
+    jmp .finish
+.error:
+    PRINT_STRING "Can't insert"
+.finish:
+    pop edx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+;вставить элемент в нужное место по возрастанию элементов    
+insert:
+    push ebp
+    mov ebp, esp
+    push eax
+    push edx
+    push ebx
+    
+    mov eax, [ebp + 8]                ;elem
+    mov edx, [ebp + 12]               ;head
+    call new
+    cmp edi, NULL
+    je E
+    mov [edi + elem], al
+    cmp edx, NULL
+    je S
+    cmp [edx + elem], al
+    jg S                          ;head > element
+    mov ecx, edx
+    mov ebx, [edx + next]
+.L: cmp ebx, NULL
+    je .insrt
+    cmp [ebx + elem], al
+    jg .insrt                     ; >
+    mov edx, ebx
+    mov ebx, [ebx + next]
+    jmp .L
+.insrt:
+    mov [edx + next], edi
+    mov [edi + next], ebx
+    jmp F
+S:  mov [edi + next], edx
+    jmp F
+E:  PRINT_STRING "Can't insert"
+F:  mov edi, ecx
+    pop ebx
+    pop edx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+      
+global CMAIN
+CMAIN:
+    mov eax, 67
+    call init_heap                  ;инициализация кучи
+    call read_list                  ;считывание списка
+    push heap
+    push eax
+    call insert            
+    add esp, 8
+    push heap
+    call print_list
+    add esp, 4
+    xor eax, eax
+    ret

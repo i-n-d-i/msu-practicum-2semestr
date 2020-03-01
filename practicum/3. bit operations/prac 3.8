@@ -1,0 +1,17 @@
+%include "io.inc"
+;дано число n, 1<=n<=32. вывести n первых степеней двойки в обратном порядке
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, cl                 ;get n
+    mov bx, 1
+    shl bx, cl                     ;bx = 2 ^ cl
+B:  PRINT_UDEC 2, bx
+    PRINT_CHAR ' '
+    dec cl                         ;cl--
+    cmp cl, 0
+    je C                           ;if(cl == 0)   goto C
+    shr bx, 1                      ;bx = bx / 2
+    jmp B
+C:  xor eax, eax
+    ret

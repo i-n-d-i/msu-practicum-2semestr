@@ -1,0 +1,221 @@
+%include "io.inc"
+;распечатать уровень дерева
+heap_size equ 20
+NULL equ 0
+
+struc tree_node
+    elem resb 8
+    left resd 1
+    right resd 1
+endstruc
+
+section .data
+    new_word times 8 db 0
+    
+section .bss
+    heap_ptr resd 1
+    heap resb heap_size*tree_node_size    
+   
+    
+section .text
+global CMAIN    
+CMAIN:
+    call INIT_HEAP
+    mov ecx, 0
+    mov eax, NULL                     ;root
+next_letter:
+    GET_CHAR bl
+    cmp bl, '.'
+    je next_word
+    cmp bl, ','
+    je next_word
+    mov [new_word + ecx], bl
+    inc ecx
+    jmp next_letter
+next_word:
+    push eax
+    call INSERT
+    pop eax
+    mov dword [new_word], 0
+    mov dword [new_word + 4], 0
+    mov ecx, 0
+    cmp bl, '.'
+    jne next_letter
+  
+    GET_UDEC 1, dh                          ;level 
+    mov dl, 0
+    push eax
+    call PRINT_LEVEL
+    add esp, 4
+    xor eax, eax
+    ret
+    
+    
+PRINT_LEVEL:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ecx
+    
+    inc dl    
+    mov eax, [ebp + 8]                  ;root
+    cmp eax, NULL
+    je eexit
+    
+    push dword [eax + left]
+    call PRINT_TREE
+    add esp, 4
+    dec dl
+    cmp dl, dh
+    jne next
+
+    mov ecx, 0
+print: 
+    cmp ecx, 8
+    je K
+    cmp byte [eax + elem + ecx], 0
+    je K
+    PRINT_CHAR [eax + elem + ecx]    
+    inc ecx
+    jmp print
+K:  PRINT_STRING ' '
+next:   
+    push dword [eax + right]
+    call PRINT_TREE
+    add esp, 4
+    dec dl
+eexit:   
+    pop ecx 
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+    
+INSERT:    
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+    push edx
+    
+    mov eax, [ebp + 8]                 ;root
+    cmp eax, NULL
+    jne continue
+    
+    call NEW
+    cmp edi, NULL
+    je end
+    mov ecx, 0
+word_reading:  
+    cmp ecx, 8
+    je insert_root
+    mov bl, [new_word + ecx]
+    mov [edi + elem + ecx], bl 
+    inc ecx
+    jmp word_reading
+insert_root: 
+    mov dword [edi + left], NULL
+    mov dword [edi + right], NULL
+    mov [ebp + 8], edi
+    jmp end
+continue:
+    cmp eax, NULL
+    je place_elem
+    mov ecx, 0
+compare:
+    mov bl, [new_word + ecx]
+    cmp bl, [eax + elem + ecx]
+    ja .above
+    jb .below
+    inc ecx
+    cmp ecx, 8
+    jne compare
+.above: 
+    mov edx, eax
+    add edx, right
+    mov eax, [eax + right]
+    jmp continue
+.below: 
+    mov edx, eax
+    add edx, left
+    mov eax, [eax + left]
+    jmp continue
+place_elem:
+    call NEW
+    cmp edi, NULL
+    je end
+    mov ecx, 0
+H:  cmp ecx, 8
+    je insert_word  
+    mov bl, [new_word + ecx]
+    mov [edi + elem + ecx], bl
+    inc ecx
+    jmp H
+insert_word:  
+    mov dword [edi + left], NULL
+    mov dword [edi + right], NULL
+    mov [edx], edi
+end:
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+;allocate memory for node (edi will contain the address of new element)
+NEW:
+    push ebp
+    mov ebp, esp
+    push ebx
+    ;get the beginning of a list
+    mov edi, [heap_ptr]
+    cmp edi, NULL
+    jne .not_empty
+    PRINT_STRING "Heap is empty."
+    NEWLINE
+    jmp .end
+.not_empty:
+    mov ebx, [edi + right]
+    mov [heap_ptr], ebx    
+.end:    
+    pop ebx
+    mov esp, ebp
+    pop ebp
+    ret
+
+;initializion of heap
+INIT_HEAP:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+    ;the beginning of heap
+    mov eax, heap
+    mov [heap_ptr], eax
+    mov ecx, heap_size - 1
+.load:
+    ;get current node
+    mov ebx, eax
+    ;find next node
+    add ebx, tree_node_size
+    ;set the pointer
+    mov [eax + right], ebx
+    add eax, tree_node_size
+    loop .load
+    
+    ;make null pointer for the last node
+    mov [eax + left], dword NULL
+    mov [eax + right], dword NULL
+   
+    pop ecx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    

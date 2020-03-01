@@ -1,0 +1,38 @@
+%include "io.inc"
+;проверить можно ли из данной строки удалить символы так, чтобы осталось слово abc
+
+section .text
+function:
+    push ebp
+    mov ebp, esp
+    
+A:  GET_CHAR al
+    cmp al, 'a'
+    je B
+    cmp al, '.'
+    je H
+    jmp A
+B:  GET_CHAR al
+    cmp al, 'b'
+    je C
+    cmp al, '.'
+    je H
+    jmp B
+C:  GET_CHAR al
+    cmp al, 'c'
+    je M
+    cmp al, '.'
+    jne C
+H:  PRINT_STRING 'NO'
+    jmp finish
+M:  PRINT_STRING 'YES'
+finish: 
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    call function
+    xor eax, eax
+    ret

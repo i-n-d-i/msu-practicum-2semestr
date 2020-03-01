@@ -1,0 +1,44 @@
+%include "io.inc"
+;вернуть a^n, где n - неотрицательное число
+degree:
+    push ebp
+    mov ebp, esp
+    
+    push eax
+    push ebx
+    mov ebx, [ebp + 12]      ;   n
+    mov eax, [ebp + 8]       ;   a
+    
+    cmp ebx, 0 
+    jne A
+    mov dword [ebp + 8], 1
+    jmp finish
+
+A:  dec ebx
+    push ebx
+    push eax
+    call degree
+    pop ebx
+    add esp, 4
+    mul ebx
+    mov [ebp + 8], eax
+    
+finish:
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    GET_UDEC 4, eax          ;   a
+    GET_UDEC 4, ebx          ;   n
+    
+    push ebx
+    push eax
+    call degree
+    PRINT_UDEC 4, [esp]
+    add esp, 8
+    xor eax, eax
+    ret

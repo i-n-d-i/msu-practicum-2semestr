@@ -1,0 +1,137 @@
+%include "io.inc"
+                                  ;СЕМЕСТРОВАЯ РАБОТА № 1 (2 вариант)
+;свойство - текст содержит не менее трех латинских букв
+;да - заменить каждую ненулевую цифру на соответ. ей по порядковому номеру
+;строчную букву латинского алфавита 1 -> a, 2 -> b и т.д.
+;нет - в каждой группе следующих подряд одинаковых литер оставить только одну из них
+
+section .bss
+    s resb 100
+section .text
+check:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    mov eax, [ebp + 8]                   ;adress
+    xor ebx, ebx                         ;number of letters
+        
+A:  cmp byte [eax], '.'
+    je E
+B:  cmp byte [eax], 'a'
+    jb C     
+    cmp byte [eax], 'z'
+    ja C
+    inc ebx
+    jmp D            
+C:  cmp byte [eax], 'A'
+    jb D
+    cmp byte [eax], 'Z'
+    ja D
+    inc ebx
+D:  inc eax
+    jmp A
+E:  mov dword [ebp + 8], ebx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+rule_one:
+    push ebp
+    mov ebp, esp
+    push ebx
+    
+    mov ebx, [ebp + 8]     ;address
+F:  cmp byte [ebx], '.'
+    je H 
+    cmp byte [ebx], '1'
+    jb G
+    cmp byte [ebx], '9'
+    ja G
+    add byte [ebx], '0'
+G:  inc ebx
+    jmp F 
+H:  pop ebx
+    mov esp, ebp
+    pop ebp
+    ret
+
+rule_two:
+    push ebp
+    mov ebp, esp
+    push ebx
+    push edx
+    push ecx
+
+    mov ebx, [ebp + 8]            ;adress 
+    cmp byte [ebx], '.'
+    je L
+    mov dl, byte [ebx]
+I:  inc ebx
+    cmp byte [ebx], '.'
+    je L
+    mov dh, byte [ebx]
+    cmp dh, dl
+    je K
+    mov dl, dh
+    jmp I
+K:  mov byte [ebx], '*'
+    jmp I  
+        
+L:  xor eax, eax
+    mov ebx, [ebp + 8]                 ;adress
+M:  cmp byte [ebx + eax], '*'
+    jne P
+    mov ecx, eax
+    inc ecx
+N:  cmp byte [ebx + ecx], '*'
+    jne O
+    inc ecx
+    jmp N 
+O:  mov dh, [ebx + eax]
+    xchg dh, [ebx + ecx]
+    mov [ebx + eax], dh
+P:  cmp byte [ebx + eax], '.'
+    je R
+    inc eax
+    jmp M
+R:  mov byte [ebx + eax], 0
+    pop ecx
+    pop edx
+    pop ebx
+    mov esp, ebp
+    pop ebp
+    ret        
+    
+global CMAIN
+CMAIN:
+    GET_STRING s, 100
+    PRINT_STRING s
+    NEWLINE
+    push dword s
+    call check
+    pop eax
+    cmp eax, 3
+    jae first                             ;if(ah >= 3)   goto first
+ 
+    PRINT_STRING 'the second conversion was performed'
+    NEWLINE
+    push dword s
+    call rule_two
+    add esp, 4
+    PRINT_STRING s
+    jmp finish
+first:
+    PRINT_STRING 'the first conversion was performed'
+    NEWLINE
+    push dword s
+    call rule_one
+    add esp, 4
+    PRINT_STRING s    
+finish:
+    xor eax, eax
+    ret
+    
+    

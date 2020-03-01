@@ -1,0 +1,149 @@
+%include "io.inc"
+;увеличить каждый положительный элемент списка на 1
+
+NULL equ 0
+heap_size equ 100
+
+struc node
+    elem resb 1
+    next resd 1
+endstruc
+
+section .bss
+    heap resb heap_size * node_size
+    heap_ptr resd 1
+    
+section .text
+;инициализация кучи
+init_heap:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+    
+    mov dword [heap_ptr], heap
+    mov eax, [heap_ptr]
+    mov ecx, heap_size - 1
+L:  mov ebx, eax
+    add ebx, node_size
+    mov [eax + next], ebx
+    add eax, node_size
+    loop L
+    
+    mov [eax + next], dword NULL
+    
+    pop ecx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+;создать новое звено списка
+new:
+    push ebp
+    mov ebp, esp
+    push eax
+    
+    mov edi, [heap_ptr]
+    cmp edi, NULL
+    je .empty
+    mov eax, [edi + next]
+    mov [heap_ptr], eax
+    mov [edi + next], dword NULL
+    jmp .finish
+.empty:
+    PRINT_STRING 'HEAP IS EMPTY'
+.finish:
+    pop eax
+    mov ebp, esp
+    pop ebp
+    ret  
+
+;считать список    
+read_list:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push edx
+    
+    mov eax, NULL
+    GET_DEC 1, bl
+    cmp bl, 0
+    je finish
+    call new
+    mov [edi + elem], bl
+    mov eax, edi
+    mov edx, eax
+K:  GET_DEC 1, bl
+    cmp bl, 0
+    je finish 
+    call new
+    cmp edi, NULL
+    jne .L
+    PRINT_STRING 'Can not create list'
+    jmp finish
+.L: mov [edi + elem], bl
+    mov ebx, edi
+    mov [edx + next], ebx
+    mov edx, ebx
+    jmp K
+finish:
+    pop edx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+;распечатать список
+print_list:
+    push ebp
+    mov ebp, esp
+    push eax
+    
+    mov eax, [ebp + 8]             ;head
+M:  cmp eax, NULL
+    je .finish
+    PRINT_DEC 1, [eax + elem]
+    PRINT_CHAR ' '
+    mov eax, [eax + next]
+    jmp M
+.finish:
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+increment:
+    push ebp
+    mov ebp, esp
+    push eax
+    
+    mov eax, [ebp + 8]
+J:  cmp eax, NULL
+    je FF
+    cmp byte [eax + elem], 0
+    jle N                                ; <=
+    inc byte [eax + elem]
+N:  mov eax, [eax + next]
+    jmp J 
+FF: pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    call init_heap               
+    call read_list                 
+    push heap
+    call increment
+    add esp, 4
+    push heap
+    call print_list
+    add esp, 4
+    xor eax, eax
+    ret

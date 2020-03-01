@@ -1,0 +1,19 @@
+%include "io.inc"
+;дано n, далее n байтовых знаковых чисел. вывести числа, которые больше своего левого соседа
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, cl    ;get n
+    GET_DEC 1, bl     ;get x previous
+P:  dec cl            ;cl--
+    cmp cl, 0         
+    je N              ;if(cl == 0)  goto N
+L:  GET_DEC 1, bh     ;get x current
+    cmp bl, bh         
+    jge M             ;if(bl >= bh)   goto M
+    PRINT_DEC 1, bh
+    PRINT_CHAR ' '
+M:  mov bl, bh        ;bl = bh
+    jmp P
+N:  xor eax, eax
+    ret

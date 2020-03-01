@@ -1,0 +1,47 @@
+%include "io.inc"
+;Даны 1<=m n<=100, далее матрица m*n. вывести максимальные элементы всех столбцов
+section .bss
+    m resb 1
+    n resb 1
+    a resb 100*100
+    
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [m]
+    GET_UDEC 1, [n]
+    movzx ecx, byte [m]
+    mov eax, 0                         ;i = 0
+.input1:
+    movzx edx, byte [n]
+    mov ebx, 0                         ;j = 0
+.input:    
+    GET_UDEC 1, [a + eax + ebx]        ;считывание матрицы
+    PRINT_UDEC 1, [a + eax + ebx]      ;вывод матрицы 
+    PRINT_CHAR ' '
+    inc ebx
+    dec edx
+    jnz .input
+    NEWLINE
+    add eax, ebx
+    dec ecx
+    jnz .input1
+    movzx edx, byte [n]             
+    mov ebx, 0                         ;j = 0
+K:  movzx ecx, byte [m]
+    mov eax, 0                         ;i = 0
+    mov esi, 0                         ;max = 0
+compare: 
+    movzx edi, byte [a + eax + ebx]
+    cmp edi, esi
+    jle M                              ;if  ...<= max goto M 
+    movzx esi, byte [a + eax + ebx]    ;new max
+M:  add eax, edx
+    loop compare
+    PRINT_DEC 4, esi
+    PRINT_CHAR ' '
+    inc ebx
+    cmp ebx, edx
+    jne K                              ;if(ebx != edx)   goto K
+    xor eax, eax
+    ret

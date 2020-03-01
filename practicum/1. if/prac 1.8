@@ -1,0 +1,29 @@
+%include "io.inc"
+;вывести таблицу умножения n*n
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, dl    ;get n
+    mov bl, 1         ;i = 1
+K:  cmp bl, dl        
+    ja finish         ;if(i > n)   goto finish
+    mov cl, 1         ;j = 1
+F:  cmp cl, dl     
+    ja M              ;if(j > n)   goto finish
+    mov al, bl
+    mul cl            ;ax = al * cl
+    PRINT_UDEC 1, bl
+    PRINT_CHAR '*'
+    PRINT_UDEC 1, cl
+    PRINT_CHAR '='
+    PRINT_UDEC 2, ax
+    PRINT_CHAR ' '
+    PRINT_CHAR ' '
+    inc cl            ;j++
+    jmp F
+M:  NEWLINE 
+    inc bl            ;i++
+    jmp K
+finish:  
+    xor eax, eax
+    ret

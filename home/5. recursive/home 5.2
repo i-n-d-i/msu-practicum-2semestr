@@ -1,0 +1,36 @@
+%include "io.inc"
+;вернуть k такое, что 3^k = x, и -1, если такого целого числа нет
+section .text
+degree:
+    push ebp
+    mov ebp, esp
+    
+    mov ebx, 0
+    cmp eax, 1
+    je finish                        ;if(x == 1)   goto finish
+M:  mov edx, 0
+    mov ecx, 3
+    div ecx                          ;edx = edx:eax % 3
+    cmp edx, 0
+    je K
+    mov ebx, -1
+    jmp finish
+K:  call degree
+    add esp, 4
+    cmp ebx, -1
+    je finish
+    inc ebx
+finish:
+    mov esp, ebp
+    pop ebp
+    ret
+
+global CMAIN
+CMAIN:
+    GET_UDEC 4, eax                  ;get x
+    push eax
+    call degree
+    add esp, 4
+    PRINT_DEC 4, ebx
+    xor eax, eax
+    ret

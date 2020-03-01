@@ -1,0 +1,18 @@
+%include "io.inc"
+;дано число n, 0<=n<=60000. вывести 'yes', если оно является точным квадратом и 'no' иначе
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, cx    ;get n
+    mov bl, 1
+A:  mov al, bl        ;al = bl
+    mul bl            ;ax = al * bl
+    inc bl            ;bl++
+    cmp ax, cx
+    jb A              ;if(ax < cx)
+    je B
+    PRINT_STRING "no"
+    jmp C
+B:  PRINT_STRING "yes"
+C:  xor eax, eax
+    ret

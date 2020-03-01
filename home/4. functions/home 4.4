@@ -1,0 +1,24 @@
+%include "io.inc"
+;написать и проверить функцию, возвращающую первую цифру данного
+;неотрицательного четырехбайтового числа
+section .text
+first.digit:
+    push ebp
+    mov ebp, esp
+    mov ecx, 10
+K:  mov edx, 0
+    div ecx               ;edx = edx:eax % 10        eax = .../10
+    cmp eax, 0
+    jne K
+L:  PRINT_UDEC 4, edx  
+    mov esp, ebp
+    pop ebp
+    ret
+global CMAIN
+CMAIN:
+    GET_UDEC 4, eax       ;get x
+    push eax
+    call first.digit
+    add esp, 4
+    xor eax, eax
+    ret

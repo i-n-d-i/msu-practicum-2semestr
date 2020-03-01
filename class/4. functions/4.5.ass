@@ -1,0 +1,54 @@
+%include "io.inc"
+;найти сумму первых десяти элементов массива
+section .bss
+    a resd 100
+    
+section .text
+function:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+    push edx
+    
+    mov eax, [ebp + 12]                  ;начало массива  a[0]                              
+    mov ebx, [ebp + 8]                   ;количество элементов массива  n 
+    mov ecx, 0  
+    mov edx, 0                           ;sum = 0
+A:  cmp ecx, ebx
+    je C                                 ;if(ecx = n)  goto C
+    add edx, dword [eax + 4 * ecx]
+    inc ecx
+    jmp A
+    
+C:  mov [ebp + 8], edx
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    mov eax, 0                               
+    mov ecx, 10                          ;количество элементов массива
+D:  GET_DEC 4, [a + 4 * eax]
+    inc eax
+    loop D
+    
+    push dword a     
+    push dword 10   
+    call function
+    PRINT_DEC 4, [esp]
+    add esp, 8
+    xor eax, eax
+    ret
+
+
+
+
+
+

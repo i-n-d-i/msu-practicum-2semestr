@@ -1,0 +1,17 @@
+%include "io.inc"
+;1-я задача, 2-я версия
+section .data
+    a dd 3.7
+    b dd 4.3
+    c dd 2.5
+    x dd 0
+section .text
+global CMAIN
+CMAIN:
+    fld dword [a]
+    fadd dword [b]
+    fmul dword [c]
+    fistp dword [x]
+    PRINT_UDEC 4, [x]
+    xor eax, eax
+    ret

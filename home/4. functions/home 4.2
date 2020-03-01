@@ -1,0 +1,22 @@
+%include "io.inc"
+;записать в стек цифры четырехбайтового числа и вывести их
+ 
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, eax        ;get n
+    mov ecx, 10
+    mov ebx, 0             ;счетчик для к-ва цифр числа
+L:  mov edx, 0
+    div ecx                ;edx = edx:eax % 10         eax = edx:eax / 10                
+    push edx
+    inc ebx                ;ebx++
+    cmp eax, 0
+    jne L                  ;if(eax != 0)    goto L
+K:  pop edx
+    PRINT_UDEC 4, edx
+    PRINT_CHAR ' '
+    dec ebx                ;ebx--
+    jnz K                  ;if(ebx != 0)    goto K
+    xor eax, eax
+    ret

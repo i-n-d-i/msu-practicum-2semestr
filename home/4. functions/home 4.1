@@ -1,0 +1,22 @@
+%include "io.inc"
+;записывать в стек вводимые числа, пока не встретится 0 - признак конца последовательности
+;вывести числа в обратном порядке
+section .text
+global CMAIN
+CMAIN:
+    xor ecx, ecx                   ;ecx = 0
+.input:  
+    GET_DEC 4, eax
+    cmp eax, 0
+    je .finish                     ;if(eax == 0)   goto finish
+    push eax 
+    inc ecx                        ;ecx++
+    jmp .input
+.finish:
+    pop eax
+    PRINT_DEC 4, eax
+    PRINT_CHAR ' ' 
+    dec ecx                        ;ecx--
+    jnz .finish                    ;if(ecx != 0)   goto finish
+    xor eax, eax
+    ret

@@ -1,0 +1,28 @@
+%include "io.inc"
+;макрос alpha должен принимать один параметр (конечное значение) и выделять указанное 
+;количество байт, заполняя их значениями от 1 до конечного.
+;Например, alpha 3 должно давать тот же результат, что и db 1, 2, 3
+
+%macro alpha 1
+    %assign i 1
+    %rep %1
+    db i
+    %assign i i+1
+    %endrep
+%endmacro
+
+section .data
+    a alpha 5
+
+section .text
+global CMAIN
+CMAIN:
+    mov ebx, 0
+    mov ecx, 5
+L:  PRINT_UDEC 1, [a + ebx]
+    PRINT_CHAR ' '
+    inc ebx
+    dec ecx
+    jnz L
+    xor eax, eax
+    ret

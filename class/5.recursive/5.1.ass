@@ -1,0 +1,26 @@
+%include "io.inc"
+;вывести максимум последовательности чисел, заканчивающейся 0
+section .text
+maximum:
+    push ebp
+    mov ebp, esp
+    GET_UDEC 4, eax               ;get x
+    cmp eax, 0
+    je finish                     ;if(x == 0)    goto finish
+    push eax
+    call maximum
+    add esp, 4
+    cmp eax, [ebp - 4]
+    ja finish                     ;if(...>...)   goto finish
+    mov eax, [ebp - 4]            
+finish:    
+    mov esp, ebp
+    pop ebp
+    ret
+
+global CMAIN
+CMAIN:
+    call maximum
+    PRINT_UDEC 4, eax             ;maximum
+    xor eax, eax
+    ret

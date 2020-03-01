@@ -1,0 +1,28 @@
+%include "io.inc"
+;найти ко-во элементов массива, которые больше, чем последний
+section .bss
+    n resb 1
+    a resw 25
+  
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [n]                   ;get n
+    mov ebx, 0
+    mov ecx, 0                        ;mov dl, [n]
+    mov cl, [n]                       ;movzx ecx, dl       ;movzx ecx, byte [n] 
+L:  GET_DEC 2, [a + 2* ebx]
+    inc ebx                           ;ebx++
+    loop L                            ;ecx--   if(ecx != 0)   goto L
+    mov dx, [a + 2 * ebx - 2]         ;последний элемент массива
+    mov ebx, 0
+    mov ax, 0                         ;счетчик
+    mov cl, [n]
+M:  cmp dx, [a + 2 * ebx]
+    jge N                             ;if (>=)    goto N
+    inc ax                            ;ax++
+N:  inc ebx                         
+    loop M
+    PRINT_UDEC 2, ax
+    xor eax, eax
+    ret

@@ -1,0 +1,21 @@
+%include "io.inc"
+;вывести квадрат из n звездочек
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx     ;get n
+    mov ebx, 0          ;i = 0   к-во строк
+K:  cmp ebx, ecx         
+    je finish           ;if(i == n)    goto finish
+    mov edx, 0          ;j = 0  к-во звездочек в строке
+F:  cmp edx, ecx        
+    je M                ;if(j == n)    goto M
+    PRINT_CHAR '*'
+    inc edx             ;j++
+    jmp F
+M:  NEWLINE
+    inc ebx             ;i++
+    jmp K
+finish: 
+    xor eax, eax
+    ret

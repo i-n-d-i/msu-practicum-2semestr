@@ -1,0 +1,21 @@
+%include "io.inc"
+;дано число n, 1<=n<=250. вывести n первых квадратов, не используя операции умножения
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, al           ;get n
+    mov ch, 0                ;i = 0
+B:
+    inc ch                   ;i++
+    mov cl, ch               ;cl = i
+    mov ah, 0      
+A: 
+    add ah, ch               ;ah += i
+    dec cl                   ;cl--
+    jnz A                    ;if(cl != 0)   goto A
+    PRINT_UDEC 1, ah
+    PRINT_CHAR ' '
+    cmp al, ch            
+    jne B                    ;if(al != ah)   goto B
+    xor eax, eax
+    ret

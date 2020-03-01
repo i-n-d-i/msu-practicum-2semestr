@@ -1,0 +1,16 @@
+%include "io.inc"
+;дано n, далее n чисел. посчитать сумму положительных чисел
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx   ;считывает количество байтовых чисел n
+    mov eax, 0        ;sum = 0
+    jecxz C           ;if(n == 0) goto C
+B:  GET_DEC 4, ebx    ;считывает числа x
+    cmp ebx, 0        
+    jle M             ;if(ebx <= 0) goto M
+    add eax,ebx       ;sum += x
+M:  loop B            ;ecx--, if(ecx != 0) goto B
+C:  PRINT_DEC 4, eax  ;printf("%d", sum)
+    xor eax, eax
+    ret

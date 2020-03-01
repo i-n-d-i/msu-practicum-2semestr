@@ -1,0 +1,22 @@
+%include "io.inc"
+;записать в массив из 8 байтов биты регистра al
+section .bss
+    a resb 8
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, al
+    mov ecx, 0
+L:  shr al, 1                      ;al = al / 2
+    adc byte [a + ecx], 0
+    inc ecx                        ;ecx++
+    cmp ecx, 8
+    jne L                          ;if(ecx != 8)   goto L
+    mov ecx, 7
+M:  PRINT_UDEC 1, [a + ecx]
+    PRINT_CHAR ' '
+    dec ecx                        ;ecx--
+    jge M                          ;if(ecx >= 0)   goto M
+    xor eax, eax
+    ret
+    

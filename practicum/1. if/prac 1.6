@@ -1,0 +1,24 @@
+%include "io.inc"
+;дано n, 1<=n<= 100, далее n различных знаковых двухбайтовых чисел. для каждой пары 
+;соседних чисел вывести знак '>' или '<', который можно между ними поставить
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx     ;get n
+    GET_DEC 2, ax       ;x previous
+    dec ecx             ;n--
+B:  GET_DEC 2, bx       ;x current
+    cmp ax, bx
+    jg A                ;if(ax > bx)   goto A
+    PRINT_CHAR '<'
+    mov ax, bx          ;ax = bx
+    dec ecx             ;n--
+    jecxz finish        ;if(n == 0)   goto finish
+    jmp B
+A:  PRINT_CHAR '>'
+    mov ax, bx          ;ax = bx
+    dec ecx             ;n--
+    jne B               ;if(n != 0)   goto B
+finish: 
+    xor eax, eax
+    ret

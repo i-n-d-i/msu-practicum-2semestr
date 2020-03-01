@@ -1,0 +1,17 @@
+%include "io.inc"
+;дано n, далее n двухбайтовых беззнаковых чисел, найти количество 3-значных чисел 
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx   ;get n
+    mov dl, 0         ;счетчик чисел k = 0
+L:  GET_UDEC 2, bx    ;get x
+    cmp bx, 100    
+    jb M              ;if(bx < 100)  goto M
+    cmp bx, 1000
+    jae M             ;if(bx >= 1000)  goto M
+    inc dl            ;dl++
+M:  loop L            ;ecx--   if(ecx != 0)   goto L
+    PRINT_UDEC 1, dl  
+    xor eax, eax
+    ret

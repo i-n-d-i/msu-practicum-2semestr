@@ -1,0 +1,14 @@
+%include "io.inc"
+;дано число n, 0<=n<=25000. вывести цифру разряда десятков
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, ax    ;get n 
+    mov cx, 10        ;cx = 10
+    mov dx, 0
+    div cx            ;ax = dx:ax / cx     dx = ..%..
+    mov dx, 0
+    div cx            ;ax = dx:ax / cx     dx = ..%..
+    PRINT_UDEC 2, dx
+    xor eax, eax
+    ret

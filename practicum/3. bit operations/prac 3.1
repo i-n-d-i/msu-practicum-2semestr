@@ -1,0 +1,18 @@
+%include "io.inc"
+;вывести различные степени двойки, составляющие в сумме данное
+;двухбайтовое натуральное число
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, cx             ;get n
+    mov bx, 1
+A:  test cx, bx                ;and (cx % 2)      
+    jz C
+    PRINT_UDEC 2, bx
+    PRINT_CHAR ' ' 
+C:  shl bx, 1                  ;bx = bx * 2
+    jz finish
+    jmp A
+finish:  
+    xor eax, eax
+    ret

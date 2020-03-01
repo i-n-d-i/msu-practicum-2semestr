@@ -1,0 +1,22 @@
+%include "io.inc"
+;вывести все делители данного двухбайтового б/зн числа, не равного 0
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, bx   ;get x
+    mov cx, 1        ;k = 1
+A:  mov ax, bx       ;ax = bx
+    mov dx, 0
+    div cx           ;ax = dx:ax / cx   dx = ..%..
+    cmp dx, 0 
+    je D             ;if(dx == 0)  goto D
+    jmp B      
+D:  PRINT_UDEC 1, cl
+    NEWLINE
+B:  inc cx           ;cx++
+    cmp ax, 0
+    je finish        ;if(ax == 0)   goto finish
+    jmp A
+finish:
+    xor eax, eax
+    ret

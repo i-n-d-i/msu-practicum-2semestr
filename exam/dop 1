@@ -1,0 +1,45 @@
+%include "io.inc"
+;дан текст, оканчивающийся точкой. вывести каких символов в нем больше 'a' или 'b'
+section .bss
+    s resb 100
+    
+section .text
+check:
+    push ebp
+    mov ebp, esp
+    push eax
+    mov eax, [ebp + 8]                   ;adress
+          
+A:  cmp byte [eax], '.'
+    je E
+B:  cmp byte [eax], 'a'
+    jne C
+    inc dh
+    jmp D     
+C:  cmp byte [eax], 'b'
+    jne D
+    inc dl           
+D:  inc eax
+    jmp A
+E:  pop eax
+    mov esp, ebp
+    pop ebp
+    ret 
+    
+global CMAIN
+CMAIN:
+    GET_STRING s, 100
+    
+    mov edx, 0                                   ;dh - 'a'           dl - 'b'
+    push dword s
+    call check
+    add esp, 4
+    
+    cmp dh, dl
+    jg .A
+    PRINT_CHAR 'b'
+    jmp finish
+.A: PRINT_CHAR 'a'   
+finish:
+    xor eax, eax
+    ret

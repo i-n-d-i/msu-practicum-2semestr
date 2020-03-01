@@ -1,0 +1,18 @@
+%include "io.inc"
+;дана последовательность чисел, оканчивающаяся 0. вывести два последних числа
+section .text
+global CMAIN
+CMAIN:
+    GET_DEC 2, bx     
+A:  GET_DEC 2, cx
+    cmp cx, 0
+    jne B             ;if(cx != 0)   goto B
+    jmp C
+B:  mov ax, bx        ;ax = bx
+    mov bx, cx        ;bx = cx
+    jmp A
+C:  PRINT_DEC 2, ax   
+    PRINT_CHAR ' '
+    PRINT_DEC 2, bx
+    xor eax, eax
+    ret

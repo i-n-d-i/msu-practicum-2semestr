@@ -1,0 +1,19 @@
+%include "io.inc"
+;дано n, далее n чисел. найти сумму чисел, кратных 3
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx     ;get n
+    mov bx, 0           ;sum = 0
+    mov dl, 3           ;k = 3
+    jecxz C             ;if(n == 0)  goto C
+B:  GET_DEC 2, ax      
+    idiv dl             ;ah = ax % dl     al = ../..
+    cmp ah, 0
+    jne M               ;if(ah != 0) goto M 
+    imul dl             ;ax = al * dl
+    add bx, ax          ;sum += x
+M:  loop B              ;ecx--,  if(ecx != 0)  goto B
+C:  PRINT_DEC 2, bx    
+    xor eax, eax
+    ret

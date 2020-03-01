@@ -1,0 +1,42 @@
+%include "io.inc"
+;обновить время так, чтобы оно показывало через одну секунду
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, al  ; h
+    GET_UDEC 1, bl  ; m
+    GET_UDEC 1, cl  ; s
+    cmp cl, 59
+    je min
+    inc cl
+    jmp print
+min:  
+    mov cl, 0
+    cmp bl, 59
+    je hour
+    inc bl
+    jmp print
+hour:  
+    mov bl, 0
+    cmp al, 23
+    je A
+    inc al
+    jmp print
+A:  mov al, 0
+print:  
+    cmp al,9
+    ja B       ;  al > 9
+    PRINT_CHAR '0'
+B:  PRINT_UDEC 1, al
+    PRINT_CHAR 58
+    cmp bl, 9
+    ja C       ;bl > 9
+    PRINT_CHAR '0'
+C:  PRINT_UDEC 1, bl
+    PRINT_CHAR 58
+    cmp cl, 9
+    ja D       ;cl > 9
+    PRINT_CHAR '0'
+D:  PRINT_UDEC 1, cl
+    xor eax, eax
+    ret

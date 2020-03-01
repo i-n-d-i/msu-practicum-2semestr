@@ -1,0 +1,141 @@
+%include "io.inc"
+                                ;СЕМЕСТРОВАЯ РАБОТА № 1
+;свойство - текст содержит не менее трех латинских букв
+;да - заменить каждую ненулевую цифру на соответ. ей по порядковому номеру
+;строчную букву латинского алфавита 1 -> a, 2 -> b и т.д.
+;нет - в каждой группе следующих подряд одинаковых литер оставить только одну из них
+
+section .bss
+    a resb 100
+
+section .text
+input:
+    push ebp
+    mov ebp, esp
+    xor ecx, ecx                      ;к-во элементов последовательности
+A:  GET_CHAR al
+    cmp al, '.'
+    je B
+    mov byte [a + ecx], al
+    inc ecx
+    jmp A
+B:  mov esp, ebp
+    pop ebp
+    ret
+
+print:
+    push ebp
+    mov ebp, esp
+    push ecx
+    xor ebx, ebx
+C:  mov al, byte [a + ebx]
+    PRINT_CHAR al
+    inc ebx
+    loop C
+    pop ecx
+    mov esp, ebp
+    pop ebp
+    ret
+    
+num_of_letters:
+    push ebp
+    mov ebp, esp
+    
+    xor ebx, ebx
+    xor ah, ah                     ;количество букв
+D:  mov al, byte [a + ebx]
+    cmp al, 'A'
+    jb H                           ;if(...<...)
+    cmp al, 'Z'
+    ja F                           ;if(...>...)
+    inc ah
+    cmp ah, 3
+    je Z
+    jmp H
+F:  cmp al, 'a'                    
+    jb H
+    cmp al, 'z'
+    ja H
+    inc ah
+    cmp ah, 3
+    je Z
+H:  inc ebx
+    cmp ebx, ecx
+    jne D
+Z:  mov esp, ebp
+    pop ebp
+    ret   
+    
+rule_one:
+    push ebp
+    mov ebp, esp
+    xor ebx, ebx
+K:  mov al, byte [a + ebx]
+    cmp al, '1'
+    jb L
+    cmp al, '9'
+    ja L
+    add byte [a + ebx], 'a' - '1'
+L:  inc ebx
+    cmp ebx, ecx
+    jne K
+    mov esp, ebp
+    pop ebp
+    ret
+
+rule_two:
+    push ebp
+    mov ebp, esp
+    
+    push ebx
+    push eax
+    push edx
+    
+    xor ebx, ebx                          ;счетчик нового массива
+    xor eax, eax                          ;счетчик старого массива
+    xor edx, edx
+    mov dl, byte [a + eax]
+    inc eax
+    cmp eax, ecx
+    je P
+M:  mov dh, byte [a + eax]
+    cmp dh, dl
+    je O
+    mov dl, dh
+    inc ebx
+    mov byte [a + ebx], dh
+O:  inc eax
+    cmp eax, ecx
+    jne M     
+P:  inc ebx
+    mov ecx, ebx
+    
+    pop edx
+    pop eax
+    pop ebx
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    call input
+    call print
+    call num_of_letters
+    cmp ah, 3
+    je first                             ;if(ah >= 3)   goto first
+    call rule_two
+    NEWLINE
+    PRINT_STRING 'the second conversion was performed'
+    NEWLINE
+    call print
+    jmp finish
+first:
+    call rule_one
+    NEWLINE
+    PRINT_STRING 'the first conversion was performed'
+    NEWLINE
+    call print   
+finish:
+    xor eax, eax
+    ret

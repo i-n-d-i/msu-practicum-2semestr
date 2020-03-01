@@ -1,0 +1,20 @@
+%include "io.inc"
+;дано n, далее n байтовых знаковых чисел. вывести позиции чисел, кратных 10
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx    ;get n
+    mov ebx, 0         ;счетчик позиций чисел
+    mov dl, 10         ;k = 10
+K:  inc ebx            ;ebx++
+    GET_DEC 2, ax      
+    idiv dl            ;ah = ax % dl
+    cmp ah, 0
+    jne L              ;if(ah != 0)   goto L
+    PRINT_UDEC 4, ebx  
+    PRINT_CHAR ' '
+L:  cmp ebx, ecx    
+    je M               ;if(ebx == ecx)  goto M
+    jmp K               
+M:  xor eax, eax 
+    ret

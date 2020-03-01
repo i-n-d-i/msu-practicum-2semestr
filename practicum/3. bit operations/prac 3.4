@@ -1,0 +1,21 @@
+%include "io.inc"
+;дано двухбайтовое число. записать в массив из 16 элементов значения его битов
+section .bss
+    a resb 16
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, ax                 ;get n
+    mov ecx, 0
+L:  shr ax, 1                      ;ax = ax / 2
+    adc byte [a + ecx], 0
+    inc ecx                        ;ecx++
+    cmp ecx, 16
+    jne L                          ;if(ecx != 16)   goto L
+    mov ecx, 15
+M:  PRINT_UDEC 1, [a + ecx]
+    PRINT_CHAR ' '
+    dec ecx                        ;ecx--
+    jge M                          ;if(ecx >= 0)    goto M
+    xor eax, eax
+    ret

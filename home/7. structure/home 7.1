@@ -1,0 +1,127 @@
+%include "io.inc"
+;написать функцию, выводящую данный список с обратном порядке
+
+NULL equ 0
+heap_size equ 100
+
+struc node
+    elem resb 1
+    next resd 1
+endstruc
+
+section .bss
+    heap resb heap_size * node_size
+    heap_ptr resd 1
+    
+section .text
+init_heap:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+    
+    mov dword [heap_ptr], heap
+    mov eax, [heap_ptr]
+    mov ecx, heap_size - 1
+L:  mov ebx, eax
+    add ebx, node_size
+    mov [eax + next], ebx
+    add eax, node_size
+    loop L
+    
+    mov [eax + next], dword NULL
+    
+    pop ecx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+new:
+    push ebp
+    mov ebp, esp
+    push eax
+    
+    mov edi, [heap_ptr]
+    cmp edi, NULL
+    je .empty
+    mov eax, [edi + next]
+    mov [heap_ptr], eax
+    mov [edi + next], dword NULL
+    jmp .finish
+.empty:
+    PRINT_STRING 'HEAP IS EMPTY'
+.finish:
+    pop eax
+    mov ebp, esp
+    pop ebp
+    ret  
+
+reverse:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    
+    mov eax, [ebp + 8]             ;head
+    cmp eax, NULL
+    je FF
+    mov ebx, [eax + next]
+    push ebx
+    call reverse
+    add esp, 4
+    PRINT_UDEC 1, [eax]
+    PRINT_CHAR ' '
+FF: pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+read_list:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push edx
+    
+    mov eax, NULL
+    GET_UDEC 1, bl
+    cmp bl, 0
+    je finish
+    call new
+    mov [edi + elem], bl
+    mov eax, edi
+    mov edx, eax
+K:  GET_UDEC 1, bl
+    cmp bl, 0
+    je finish 
+    call new
+    cmp edi, NULL
+    jne .L
+    PRINT_STRING 'Can not create list'
+    jmp finish
+.L: mov [edi + elem], bl
+    mov ebx, edi
+    mov [edx + next], ebx
+    mov edx, ebx
+    jmp K
+finish:
+    pop edx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    call init_heap
+    call read_list
+    push heap    
+    call reverse
+    add esp, 4
+    xor eax, eax
+    ret

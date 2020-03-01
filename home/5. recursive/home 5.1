@@ -1,0 +1,32 @@
+%include "io.inc"
+;вывести цифры беззнакового четырехбайтового числа
+section .text
+digits:
+    push ebp
+    mov ebp, esp
+    
+    cmp eax, 0
+    je finish
+    mov edx, 0
+    mov ecx, 10
+    div ecx                           ;edx = edx:eax % 10
+    push edx
+    push eax
+    call digits
+    add esp, 4
+    pop edx
+    PRINT_UDEC 4, edx
+    PRINT_CHAR ' '
+finish:
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    GET_UDEC 4, eax                   ;get x
+    push eax
+    call digits
+    add esp, 4
+    xor eax, eax
+    ret

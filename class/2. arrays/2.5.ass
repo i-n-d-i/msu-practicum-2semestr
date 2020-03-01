@@ -1,0 +1,28 @@
+%include "io.inc"
+;вывести сумму четных положительных элементов массива
+section .data
+    sum dw 0
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx              ;get n
+.cycle:
+    GET_DEC 2, bx
+    mov ax, bx
+    mov dh, 2
+    idiv dh                      ;ah = ax % dh      al = ax / dh
+    cmp ah, 1
+    je .next                     ;if(ah == 1)    goto .next
+.even:
+    cmp bx, 0
+    jl .next                     ;if(bx < 0)     goto .next
+    mov ax, word [sum]
+    add ax, bx
+    mov word [sum], ax
+.next:
+    dec ecx                      ;n--
+    jnz .cycle                   ;if(n != 0)    goto .cycle
+    mov ax, word [sum]
+    PRINT_UDEC 2, ax 
+    xor eax, eax
+    ret

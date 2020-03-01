@@ -1,0 +1,15 @@
+%include "io.inc"
+;вывести целую часть логарифма данного натурального n по основанию 2
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, ax      ;get n
+    mov bx, 0           ;счетчик
+K:  shr ax, 1           ;ax = ax / 2
+    jz finish
+    inc bx              ;bx++
+    jmp K
+finish:
+    PRINT_UDEC 2, bx 
+    xor eax, eax
+    ret

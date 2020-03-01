@@ -1,0 +1,140 @@
+%include "io.inc"
+;вывести первые цифры всех положительных элементов списка
+
+NULL equ 0
+heap_size equ 100
+
+struc node
+    elem resd 1
+    next resd 1
+endstruc
+
+section .bss
+    heap resb heap_size * node_size
+    heap_ptr resd 1
+    
+section .text
+init_heap:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+    
+    mov dword [heap_ptr], heap
+    mov eax, [heap_ptr]
+    mov ecx, heap_size 
+L:  mov ebx, eax
+    add ebx, node_size
+    mov [eax + next], ebx
+    add eax, node_size
+    loop L
+    
+    mov [eax + next], dword NULL
+    
+    pop ecx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+new:
+    push ebp
+    mov ebp, esp
+    push eax
+    
+    mov edi, [heap_ptr]
+    cmp edi, NULL
+    je .empty
+    mov eax, [edi + next]
+    mov [heap_ptr], eax
+    mov [edi + next], dword NULL
+    jmp .finish
+.empty:
+    PRINT_STRING 'HEAP IS EMPTY'
+.finish:
+    pop eax
+    mov ebp, esp
+    pop ebp
+    ret  
+    
+read_list:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push edx
+    
+    mov eax, NULL
+    GET_DEC 1, bl
+    cmp bl, 0
+    je finish
+    call new
+    mov [edi + elem], bl
+    mov eax, edi
+    mov edx, eax
+K:  GET_DEC 1, bl
+    cmp bl, 0
+    je finish 
+    call new
+    cmp edi, NULL
+    jne .L
+    PRINT_STRING 'Can not create list'
+    jmp finish
+.L: mov [edi + elem], bl
+    mov ebx, edi
+    mov [edx + next], ebx
+    mov edx, ebx
+    jmp K
+finish:
+    pop edx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+function:    
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push edx
+    push ecx
+    
+    mov ebx, [ebp + 8]         ;heap
+    mov ecx, 10
+A:  cmp ebx, NULL
+    je FF
+    cmp byte [ebx + elem], 0
+    jl M                       ;< 0
+    mov eax, [ebx + elem]
+B:  xor edx, edx
+    cmp eax, 9
+    jbe C                      ;<= 9
+    div ecx
+    jmp B
+C:  PRINT_UDEC 4, eax
+    PRINT_CHAR ' '
+M:  mov ebx, [ebx + next]
+    jmp A
+FF: pop ecx
+    pop edx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+    
+section .text
+global CMAIN
+CMAIN:
+    call init_heap
+    call read_list
+    push heap
+    call function
+    add esp, 4
+    xor eax, eax
+    ret

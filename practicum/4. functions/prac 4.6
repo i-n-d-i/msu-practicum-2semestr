@@ -1,0 +1,39 @@
+%include "io.inc"
+;вернуть произвольное трехзначное число, кратное данному натуральному
+;двухбайтовому числу и -1, если такого не существует
+section .text
+function:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push edx
+    
+    mov ebx, 10
+    mov eax, [ebp + 8]                     ;данное число
+    mov dword [ebp + 8], -1
+    cmp eax, 1000
+    jae finish                             ;if(x >= 1000)    goto finish
+A:  cmp eax, 100
+    jae B                                  ;if(x >= 100)     goto B
+    mul ebx
+    jmp A
+B:  mov [ebp + 8], eax
+finish:    
+    pop edx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    xor eax, eax                        ;eax = 0
+    GET_UDEC 2, ax
+    push eax
+    call function
+    PRINT_DEC 4, [esp]
+    add esp, 4
+    xor eax, eax
+    ret

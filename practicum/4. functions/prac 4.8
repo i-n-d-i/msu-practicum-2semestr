@@ -1,0 +1,48 @@
+%include "io.inc"
+;рекурсия: вернуть a^n + a^n-1 + ... + a + 1, где a, n - четырехбайтовые беззнаковые
+;гарантируется, что ответ помещается в четыре байта
+section .text
+sum:
+    push ebp
+    mov ebp, esp
+    
+    push eax
+    push ecx
+    push edx
+    mov ecx, [ebp + 12]
+    cmp ecx, 0
+    jne T
+    mov dword [ebp + 16], 1
+    jmp fin
+T:  dec ecx
+    sub  esp, 4
+    push ecx
+    push dword [ebp + 8]
+    call sum
+    add esp, 12
+    mov eax, [esp - 4]
+    mov ebx, [ebp + 8]
+    mul ebx
+    inc eax
+    mov [ebp + 16], eax
+fin:
+    pop edx
+    pop ecx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ebx        ; a
+    GET_UDEC 4, ecx        ; n
+    sub esp, 4
+    push ecx
+    push ebx
+    call sum
+    add esp, 8
+    pop ebx
+    PRINT_UDEC 4, ebx 
+    xor eax, eax
+    ret

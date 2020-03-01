@@ -1,0 +1,15 @@
+%include "io.inc"
+;возводит в квадрат eax
+section .text
+square: 
+    push edx                   
+    mul eax 
+    pop edx                    ;чтобы не испортить edx
+    ret                        ;выходит из подпрограммы
+global CMAIN
+CMAIN:
+    GET_UDEC 4, eax
+    call square                ;вызывает подпрограмму
+    PRINT_UDEC 4, eax       
+    xor eax, eax
+    ret

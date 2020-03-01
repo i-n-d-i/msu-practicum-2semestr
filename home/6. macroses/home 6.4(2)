@@ -1,0 +1,38 @@
+%include "io.inc"
+;макрос eye должен принимать один параметр (порядок матрицы) и выделять место для 
+;байтовой единичной матрицы указанного порядка, заполнив выделенные байты соответствующими 
+;значениями. Например, eye 3 должно давать тот же результат, что и db 1, 0, 0, 0, 1, 0, 0, 0, 1
+
+%macro eye 1
+   %rep %1 - 1            ;повторяем дествие n-1 раз
+      db 1
+      %rep %1
+        db 0
+      %endrep
+   %endrep
+   db 1
+%endmacro
+
+section .data
+    a eye 7
+
+section .text
+global CMAIN
+CMAIN:
+    mov edx, 7      
+    mov eax, 0              ;i = 0            
+.output:
+    mov ecx, 7
+    mov ebx, 0              ;j = 0
+.print:  
+    PRINT_DEC 1, [a + eax + ebx]
+    PRINT_CHAR ' '
+    inc ebx
+    dec ecx
+    jnz .print
+    NEWLINE
+    add eax, 7
+    dec edx
+    jnz .output
+    xor eax, eax
+    ret

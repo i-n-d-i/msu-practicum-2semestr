@@ -1,0 +1,14 @@
+%include "io.inc"
+;посчитать к-во единичных битов в данном числе
+section .text
+global CMAIN
+CMAIN:
+    GET_DEC 2, ax         ;get x
+    mov bx, 0             ;счетчик
+    mov ecx, 16
+L:  shr ax, 1
+    adc bx, 0             ;bx = bx + CF
+    loop L
+    PRINT_UDEC 2, bx
+    xor eax, eax
+    ret

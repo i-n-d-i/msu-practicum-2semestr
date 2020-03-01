@@ -1,0 +1,46 @@
+%include "io.inc"
+section .bss
+    a resb 100
+
+section .text
+function:
+    push ebp
+    mov ebp, esp
+    
+    mov ebx, -1
+A:  inc ebx
+    cmp ebx, ecx
+    je K
+    cmp byte [a + ebx], 'a'
+    jne A
+B:  inc ebx
+    cmp ebx, ecx
+    je K
+    cmp byte [a + ebx],'b'
+    jne B
+C:  inc ebx
+    cmp ebx, ecx
+    je K
+    cmp byte [a + ebx], 'c'
+    jne C
+.yes: 
+    PRINT_STRING 'YES'
+    jmp finish
+K:  PRINT_STRING 'NO'
+finish:
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    xor ecx, ecx
+L:  GET_CHAR al
+    cmp al, '.'
+    je M
+    mov byte [a + ecx], al
+    inc ecx
+    jmp L
+M:  call function
+    xor eax, eax
+    ret

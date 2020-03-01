@@ -1,0 +1,22 @@
+%include "io.inc"
+;дано n<=100, вывести первые n элементов последовательности ФИбоначчи
+
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, dl           ;get n
+    mov dh, 0                ;счетчик i = 0 
+    mov eax, 1
+    mov ebx, 0
+A:  PRINT_UDEC 4, ebx
+    PRINT_CHAR ' '
+    inc dh                   ;i++
+    mov ecx, eax
+    add eax, ebx
+    mov ebx, ecx
+    cmp dh, dl
+    je B                     ;if(i == n)   goto B
+    jmp A                    ;goto A
+B:  xor eax, eax
+    ret
+    

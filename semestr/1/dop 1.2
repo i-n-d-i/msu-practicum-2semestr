@@ -1,0 +1,54 @@
+%include "io.inc"
+;проверить можно ли из данной строки удалить символы так, чтобы осталось слово abc
+;2-я версия(принято)
+
+section .bss
+    a resb 100
+
+section .text
+function:
+    push ebp
+    mov ebp, esp
+    push eax
+    
+    mov eax, [ebp + 8]            ;adress
+A:  cmp byte [eax], 'a'
+    je B
+    cmp byte [eax], '.'
+    je H
+    inc eax
+    jmp A
+B:  inc eax
+    cmp byte [eax], 'b'
+    je C
+    cmp byte [eax], '.'
+    je H
+    jmp B
+C:  inc eax
+    cmp byte [eax], 'c'
+    je M
+    cmp byte [eax], '.'
+    je H
+    jmp C
+M:  mov ebx, 1
+    jmp finish
+H:  mov ebx, 0
+finish:
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    GET_STRING a, 100
+    push dword a
+    call function
+    add esp, 4
+    cmp ebx, 0
+    je X
+    PRINT_STRING 'YES'
+    jmp F
+X:  PRINT_STRING 'NO'
+F:  xor eax, eax
+    ret

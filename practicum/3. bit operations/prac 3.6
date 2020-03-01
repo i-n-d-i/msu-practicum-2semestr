@@ -1,0 +1,19 @@
+%include "io.inc"
+;дано двухбайтовое натуральное число n. определить является ли n степенью двойки
+;бех применения циклов
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, ax
+    mov dx, 65535
+    add dx, ax                    ;dx = dx + ax
+    add dx, ax                    ;dx = dx + ax
+    and dx, ax
+    cmp dx, ax 
+    jne A                         ;if(dx != ax)    goto A
+    PRINT_STRING "YES"
+    jmp finish
+A:  PRINT_STRING "NO"
+finish:
+    xor eax, eax
+    ret

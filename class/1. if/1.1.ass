@@ -1,0 +1,17 @@
+%include "io.inc"
+;найти максимум из n чисел
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx   ;get n
+    GET_DEC 2, ax     ;get max
+    dec ecx           ;ecx--
+    jecxz L           ;if(n == 0)   goto L
+K:  GET_DEC 2, bx     ;get x
+    cmp ax, bx
+    jge B             ;if(ax >= bx)   goto B
+    mov ax, bx        ;max = bx
+B:  loop K            ;ecx--   if(ecx != 0)  goto K
+L:  PRINT_DEC 2, ax  
+    xor eax, eax
+    ret

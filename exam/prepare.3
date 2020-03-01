@@ -1,0 +1,44 @@
+%include "io.inc"
+;написать функцию, изменяющую произвольный байтовый массив, заменяя
+;все отрицательные элементы на нули
+section .bss
+    a resb 100
+section .text
+change:
+    push ebp
+    mov ebp, esp
+    
+    xor eax, eax
+compare:
+    cmp byte [a + eax], 0
+    jge H
+    mov byte [a + eax], 0
+H:  inc eax
+    cmp eax, ecx
+    jne compare
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    GET_DEC 4, ecx
+    xor eax, eax
+begin:
+    GET_DEC 1, [a + eax]
+    inc eax
+    cmp eax, ecx
+    jne begin
+    
+    call change
+ 
+    xor eax, eax
+print:
+    PRINT_DEC 1, [a + eax]
+    PRINT_CHAR ' '
+    inc eax
+    cmp eax, ecx
+    jne print
+finish:   
+    xor eax, eax
+    ret

@@ -1,0 +1,34 @@
+%include "io.inc"
+;вернуть к-во делителей данного б/зн двухбайтового числа
+section .text
+function:
+    push ebp
+    mov ebp, esp
+    
+    push ecx
+    xor bx, bx               ;количество делителей
+    mov cx, 1
+K:  mov ax, [ebp + 8]        ;данное число
+    mov dx, 0
+    div cx                   ;dx = dx:ax % cx      ax = .. / ..
+    cmp dx, 0
+    jne L                    ;if(dx != 0)   goto L
+    inc bx
+L:  inc cx
+    cmp cx, [ebp + 8]
+    jbe K                    ;if(cx <= ...)    goto K
+    
+    pop ecx
+    mov esp, ebp
+    pop ebp
+    ret
+
+global CMAIN
+CMAIN:
+    sub esp, 2
+    GET_UDEC 2, [esp] 
+    call function
+    add esp, 2 
+    PRINT_UDEC 2, bx  
+    xor eax, eax
+    ret

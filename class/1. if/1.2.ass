@@ -1,0 +1,15 @@
+%include "io.inc"
+;найти х в n степени
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx  ;get n
+    GET_UDEC 4, eax  ;get x
+    mov ebx,eax      ;ebx = x
+    dec ecx          ;n--
+    jecxz M          ;if(n == 0)  goto M
+L:  mul ebx          ;edx:eax = eax * ebx
+    loop L
+M:  PRINT_UDEC 4, eax
+    xor eax, eax
+    ret

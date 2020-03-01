@@ -1,0 +1,25 @@
+%include "io.inc"
+;дана последовательность чисел, оканч. 0. вывести каждое второе нечетное число
+section .text
+global CMAIN
+CMAIN:
+    mov bh, 0       ;flag    когда bh = 1, число - второе нечетное
+    mov bl, 2       
+A:  GET_DEC 2, cx   ;get x
+    cmp cx, 0
+    je finish       ;if(cx == 0)  goto finish
+    mov ax, cx      ;ax = x
+    idiv bl         ;al = ax / 2     ah = ax % 2
+    cmp ah, 0
+    je A            ;if(ah == 0)   goto A
+    cmp bh, 0       
+    je B            ;if(bh == 0)   goto B
+    mov bh, 0
+    PRINT_DEC 2, cx
+    PRINT_CHAR ' '
+    jmp A
+B:  mov bh, 1
+    jmp A 
+finish:
+    xor eax, eax
+    ret

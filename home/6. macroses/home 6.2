@@ -1,0 +1,31 @@
+%include "io.inc"
+;макрос zero должен принимать от 0 до 4 параметров(каждый из которых является одной
+;из букв a, b, c, d) и обнулять соответствующие регистры. Например, zero c, b должен
+;обнулить ecx и ebx 
+
+%define a eax
+%define b ebx
+%define c ecx
+%define d edx
+
+%macro zero 0-4
+    %rep %0
+        mov %1, 0
+        %rotate 1
+    %endrep
+%endmacro
+
+section .text
+global CMAIN
+CMAIN:
+    mov eax, 1
+    mov ebx, 1
+    mov ecx, 1
+    mov edx, 1
+    zero c, b
+    PRINT_UDEC 4, eax
+    PRINT_UDEC 4, ebx
+    PRINT_UDEC 4, ecx
+    PRINT_UDEC 4, edx
+    xor eax, eax
+    ret

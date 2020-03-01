@@ -1,0 +1,232 @@
+%include "io.inc"
+;                                   СЕМЕСТРОВАЯ РАБОТА №2
+;дана последовательность от 1 до 20 слов, каждое из которых содержит от 1 до 8 латинских букв.
+;соседние слова разделены запятой, за последним словом следует точка. требуется ввести эту 
+;последовательность и преобразовать ее во внутреннее представление, а затем напечатать по алфавиту
+;определенные слова с дополнительной информацией.
+
+;1) двоичное дерево поиска (слева от каждой вершины  находятся только те слова, что предшествуют
+;этому слову по алфавиту, а справа - следующие за ним по алфавиту)
+;2) все различные слова (без повторений)
+;3) число вхождений слова в последовательность
+
+heap_size equ 20
+NULL equ 0
+
+struc tree_node
+    elem resb 8
+    left resd 1
+    right resd 1
+    num resd 1                         ;counter
+endstruc
+
+section .data
+    new_word times 8 db 0
+    
+section .bss
+    heap_ptr resd 1
+    heap resb heap_size*tree_node_size    
+   
+    
+section .text
+global CMAIN    
+CMAIN:
+    call INIT_HEAP
+    mov ecx, 0
+    mov eax, NULL                     ;root
+next_letter:
+    GET_CHAR bl
+    cmp bl, '.'
+    je next_word
+    cmp bl, ','
+    je next_word
+    mov [new_word + ecx], bl
+    inc ecx
+    jmp next_letter
+next_word:
+    push eax
+    call INSERT
+    pop eax
+    mov dword [new_word], 0
+    mov dword [new_word + 4], 0
+    mov ecx, 0
+    cmp bl, '.'
+    jne next_letter
+   
+    push eax
+    call PRINT_TREE
+    add esp, 4
+    xor eax, eax
+    ret
+    
+    
+PRINT_TREE:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ecx
+        
+    mov eax, [ebp + 8]                  ;root
+    cmp eax, NULL
+    je .exit
+    
+    push dword [eax + left]
+    call PRINT_TREE
+    add esp, 4
+    
+    mov ecx, 0
+.print: 
+    cmp ecx, 8
+    je .next
+    cmp byte [eax + elem + ecx], 0
+    je .next
+    PRINT_CHAR [eax + elem + ecx]    
+    inc ecx
+    jmp .print
+.next:    
+    PRINT_STRING ' - '
+    mov ebx, [eax + num]
+    PRINT_UDEC 4, ebx
+    NEWLINE
+    push dword [eax + right]
+    call PRINT_TREE
+    add esp, 4
+.exit:   
+    pop ecx 
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+    
+INSERT:    
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+    push edx
+    
+    mov eax, [ebp + 8]                 ;root
+    cmp eax, NULL
+    jne continue
+    
+    call NEW
+    cmp edi, NULL
+    je end
+    mov ecx, 0
+word_reading:  
+    cmp ecx, 8
+    je insert_root
+    mov bl, [new_word + ecx]
+    mov [edi + elem + ecx], bl 
+    inc ecx
+    jmp word_reading
+insert_root:  
+    mov dword [edi + num], 1
+    mov dword [edi + left], NULL
+    mov dword [edi + right], NULL
+    mov [ebp + 8], edi
+    jmp end
+continue:
+    cmp eax, NULL
+    je place_elem
+    mov ecx, 0
+compare:
+    mov bl, [new_word + ecx]
+    cmp bl, [eax + elem + ecx]
+    ja .above
+    jb .below
+    inc ecx
+    cmp ecx, 8
+    jne compare
+    inc dword [eax + num]                 ;if equal
+    jmp end
+.above: 
+    mov edx, eax
+    add edx, right
+    mov eax, [eax + right]
+    jmp continue
+.below: 
+    mov edx, eax
+    add edx, left
+    mov eax, [eax + left]
+    jmp continue
+place_elem:
+    call NEW
+    cmp edi, NULL
+    je end
+    mov ecx, 0
+H:  cmp ecx, 8
+    je insert_word  
+    mov bl, [new_word + ecx]
+    mov [edi + elem + ecx], bl
+    inc ecx
+    jmp H
+insert_word:  
+    mov dword [edi + num], 1
+    mov dword [edi + left], NULL
+    mov dword [edi + right], NULL
+    mov [edx], edi
+end:
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+;allocate memory for node (edi will contain the address of new element)
+NEW:
+    push ebp
+    mov ebp, esp
+    push ebx
+    ;get the beginning of a list
+    mov edi, [heap_ptr]
+    cmp edi, NULL
+    jne .not_empty
+    PRINT_STRING "Heap is empty."
+    NEWLINE
+    jmp .end
+.not_empty:
+    mov ebx, [edi + right]
+    mov [heap_ptr], ebx    
+.end:    
+    pop ebx
+    mov esp, ebp
+    pop ebp
+    ret
+
+;initializion of heap
+INIT_HEAP:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+    ;the beginning of heap
+    mov eax, heap
+    mov [heap_ptr], eax
+    mov ecx, heap_size - 1
+.load:
+    ;get current node
+    mov ebx, eax
+    ;find next node
+    add ebx, tree_node_size
+    ;set the pointer
+    mov [eax + right], ebx
+    add eax, tree_node_size
+    loop .load
+    
+    ;make null pointer for the last node
+    mov [eax + left], dword NULL
+    mov [eax + right], dword NULL
+   
+    pop ecx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    

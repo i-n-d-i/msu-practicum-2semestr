@@ -1,0 +1,26 @@
+%include "io.inc"
+;дано n<=100, далее n целых чисел. вывести их в обратном порядке
+section .bss
+    n resb 1
+    a resd 100
+
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [n]                         ;get n
+    mov ebx, 0
+    movzx ecx, byte [n]                     ;ecx = n
+L:  GET_DEC 4, [a + 4 * ebx]                ;считывание массива
+    inc ebx                                
+    loop L                                  
+    dec ebx                                 ;ebx = n - 1                                
+print:    
+    PRINT_DEC 4, [a + 4 * ebx]
+    PRINT_CHAR ' ' 
+    cmp ebx, 0       
+    je finish                               ;if(ebx == 0)   goto finish
+    dec ebx
+    jmp print
+finish:
+    xor eax, eax
+    ret

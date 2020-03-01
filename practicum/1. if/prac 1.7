@@ -1,0 +1,31 @@
+%include "io.inc"
+;дано n, 1<=n<=100, далее n беззнаковых двухбайтовых чисел. 
+;для каждого из них вывести к-во его нечетных цифр
+
+section .bss
+    a resb 1
+
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [a]      ;get n
+L:  mov cx, 0            ;счетчик
+    GET_UDEC 2, ax       ;get x
+I:  cmp ax, 0        
+    jne K                ;if(ax != 0)    goto K
+    jmp J                ;goto J
+K:  mov bx, 2         
+    mov dx, 0
+    div bx               ;ax = dx:ax / 2     dx = ...% 2
+    add cx, dx           ;cx += dx
+    mov bx, 5            
+    mov dx, 0
+    div bx               ;ax = dx:ax / 5     dx = ...% 5
+    jmp I                ;goto I
+J:  PRINT_UDEC 2, cx
+    NEWLINE
+    dec byte [a]         ;n--
+    cmp byte [a], 0     
+    jne L                ;if(n != 0)    goto L
+    xor eax, eax
+    ret

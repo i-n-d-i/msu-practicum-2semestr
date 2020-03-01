@@ -1,0 +1,20 @@
+%include "io.inc"
+;дано 2-байтовое б/зн ненулевое n. найти макс целое к такое, что 3^k <= n
+
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, ax   ;get n
+    mov bx, 3        ;k = 3
+    mov cx, 0        ;счетчик
+compare:  
+    cmp ax, bx 
+    jb finish        ;if(n < 3)
+    mov dx, 0
+    div bx           ;ax = dx:ax / bx     dx = ...%...   n = n / 3
+    inc cx           ;cx++
+    jmp compare
+finish:  
+    PRINT_UDEC 1, cx 
+    xor eax, eax
+    ret

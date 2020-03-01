@@ -1,0 +1,29 @@
+%include "io.inc"
+;вывести числа от n до 1
+section .text
+function:
+    push ebp
+    mov ebp, esp
+    push eax
+    mov eax, [ebp + 8]              ;eax = n
+    PRINT_UDEC 4, eax
+    PRINT_CHAR ' '
+    cmp eax, 1            
+    je finish                       ;if(eax <= 1)   goto finish
+    dec eax                         ;n--
+    push eax             
+    call function
+finish:   
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx                 ;get n
+    push ecx
+    call function
+    add esp, 4   
+    xor eax, eax
+    ret

@@ -1,0 +1,20 @@
+%include "io.inc"
+;дано n, 1<=n<=100, далее n знаковых двухбайтовых чисел. вывести сумму
+;всех неотрицательных чисел
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, bl     ;get n
+    mov dx, 0          ;sum = 0
+A:  cmp bl, 0
+    je finish          ;if(bl == 0)   goto finish
+    GET_DEC 2, ax      ;get x
+    dec bl             ;bl--
+    cmp ax, 0
+    jl A               ;if(ax < 0)
+    add dx, ax         ;sum += x
+    jmp A
+finish:
+    PRINT_UDEC 2, dx
+    xor eax, eax
+    ret

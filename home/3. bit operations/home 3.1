@@ -1,0 +1,16 @@
+%include "io.inc"
+;поменять местами значения двух регистров, не используя операций
+;пересылки и арифметических операций
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, eax     
+    GET_UDEC 4, ebx
+    xor eax, ebx                  
+    xor ebx, eax
+    xor eax, ebx
+    PRINT_UDEC 4, eax
+    PRINT_CHAR ' '
+    PRINT_UDEC 4, ebx
+    xor eax, eax
+    ret

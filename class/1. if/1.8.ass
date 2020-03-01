@@ -1,0 +1,22 @@
+%include "io.inc"
+;дана последовательность байтовых знаковых чисел, зак. 0. вывести к-во пол. и отр. чисел
+section .text
+global CMAIN
+CMAIN:
+    mov al, 0       ;счетчик +
+    mov bl, 0       ;счетчик -
+L:  GET_DEC 1, dl  
+    cmp dl, 0       
+    jg positive     ;if(dl > 0)
+    je finish       ;if(dl == 0)
+    inc bl          ;bl++
+    jmp L           
+positive:
+    inc al          ;al++
+    jmp L       
+finish:  
+    PRINT_UDEC 1, al
+    NEWLINE
+    PRINT_UDEC 1, bl    
+    xor eax, eax
+    ret

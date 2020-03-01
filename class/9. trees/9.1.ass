@@ -1,0 +1,174 @@
+%include "io.inc"
+;сумма элементов дерева
+
+heap_size equ 20
+NULL equ 0
+
+struc tree_node
+    elem resb 8
+    left resd 1
+    right resd 1
+endstruc
+    
+section .bss
+    heap_ptr resd 1
+    heap resb heap_size*tree_node_size    
+
+section .text
+;allocate memory for node (edi will contain the address of new element)
+NEW:
+    push ebp
+    mov ebp, esp
+    push ebx
+    
+    mov edi, [heap_ptr]
+    cmp edi, NULL
+    jne .not_empty
+    PRINT_STRING "Heap is empty."
+    NEWLINE
+    jmp .end
+    
+.not_empty:
+    mov ebx, [edi + right]
+    mov [heap_ptr], ebx    
+    
+.end:    
+    pop ebx
+    mov esp, ebp
+    pop ebp
+    ret
+
+;initializion of heap
+INIT_HEAP:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+   
+    mov eax, heap
+    mov [heap_ptr], eax
+    mov ecx, heap_size - 1
+.load:
+   
+    mov ebx, eax
+    add ebx, tree_node_size
+    
+    mov [eax + right], ebx
+    add eax, tree_node_size
+    loop .load
+    
+    mov [eax + left], dword NULL
+    mov [eax + right], dword NULL
+   
+    pop ecx
+    pop ebx
+    pop eax
+    
+    mov esp, ebp
+    pop ebp
+    ret
+
+INSERT:
+    push ebp
+    mov ebp, esp
+    push ebx
+    push ecx
+    push edx
+    
+    mov eax, [ebp + 8]         ;root
+    mov ebx, [ebp + 12]        ;elem
+    
+    call NEW
+    cmp edi, NULL
+    je fin
+cont:
+    mov [edi + elem], bl
+    cmp eax, NULL
+    jne insrt
+    mov [ebp + 8], edi
+    jmp fin1
+insrt:
+    mov edx, eax
+L:  cmp bl, [edx + elem]                ;root
+    jl less
+    mov ecx, [edx + right]
+    cmp ecx, NULL
+    jne next
+    mov [edx + right], edi
+    mov ecx, [edx + right]
+    jmp fin2
+less:
+    mov ecx, [edx + left]
+    cmp ecx, NULL
+    jne next
+    mov [edx + left], edi
+    mov ecx, [edx + left]
+    jmp fin2
+next:
+    mov edx, ecx
+    jmp L
+fin1: 
+    mov eax, [ebp + 8]
+    mov dword [eax + left], NULL
+    mov dword [eax + right], NULL
+    jmp fin
+fin2:
+    mov edx, ecx
+    mov dword [edx + left], NULL
+    mov dword [edx + right], NULL
+fin: 
+    pop edx
+    pop ecx
+    pop ebx
+    mov esp, ebp
+    pop ebp
+    ret
+            
+SUM:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ecx
+    
+    mov ebx, 0                           ;sum = 0
+    mov eax, [ebp + 8]
+    cmp eax, NULL
+    je FF
+    push dword [eax + left]
+    call SUM
+    add esp, 4
+    add ebx, [eax + elem]
+    mov ecx, ebx
+    
+    push dword [eax + right]
+    call SUM
+    add esp, 4
+    add ebx, ecx
+FF: pop ecx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    call INIT_HEAP
+    mov eax, NULL
+.l: GET_UDEC 4, edx
+    cmp edx, 0
+    je .next
+    push edx            ;elem
+    push eax
+    call INSERT
+    pop eax
+    pop edx
+    jmp .l
+    
+.next:   
+    push eax   
+    call SUM
+    add esp, 4
+    PRINT_UDEC 4, ebx
+    xor eax, eax
+    ret

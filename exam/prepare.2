@@ -1,0 +1,36 @@
+%include "io.inc"
+;написать функцию, позволяющую найти к-во цифр в произвольной строке
+section .bss
+    s resb 100
+    
+section .text
+digits:
+    push ebp
+    mov ebp, esp
+    push eax
+    mov eax, [ebp + 8]                   ;adress
+          
+A:  cmp byte [eax], '.'
+    je E
+B:  cmp byte [eax], '1'
+    jb D
+    cmp byte [eax], '9'
+    ja D
+    inc edx           
+D:  inc eax
+    jmp A
+E:  pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+global CMAIN
+CMAIN:
+    GET_STRING s, 100
+    
+    mov edx, 0                                 
+    push dword s
+    call digits
+    add esp, 4
+    PRINT_UDEC 4, edx
+    xor eax, eax
+    ret

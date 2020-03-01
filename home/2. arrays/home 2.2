@@ -1,0 +1,33 @@
+%include "io.inc"
+;дано n, 1<=n<=100. далее n знаковых 4-байтовых чисел, затем число k 
+;если число k встречается в этом массиве, вывести индекс первого вхождения, иначе вывести -1
+section .bss
+    n resb 1
+    a resd 100
+    
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [n]                         ;get n
+    mov ebx, 0
+    movzx ecx, byte [n]                     
+L:  GET_DEC 4, [a + 4 * ebx]                ;считывание массива
+    inc ebx                                
+    loop L     
+    GET_DEC 4, edx                          ;get k              
+    mov ebx, 0
+    movzx ecx, byte [n]                     
+compare:    
+    cmp edx, [a + 4 * ebx] 
+    je .print                               ;if(k == a[0])   goto print
+    inc ebx                                 ;ebx++
+    loop compare
+    jmp .print2                             ;if(ecx == 0)   goto print2
+.print:
+    PRINT_UDEC 4, ebx
+    jmp finish
+.print2:
+    PRINT_STRING '-1'
+finish:                              
+    xor eax, eax
+    ret

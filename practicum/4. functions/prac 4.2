@@ -1,0 +1,37 @@
+%include "io.inc"
+;вернуть 1, если данное беззнаковое двухбайтовое число содерит в своей 
+;записи циру '1', и 0 иначе (рекурсивная функция)
+section .text
+function:
+    push ebp
+    mov ebp, esp
+
+    push eax
+    push ebx
+    mov eax, [ebp + 8]             ;eax = x
+    mov ebx, 10
+    mov edx, 0
+    cmp eax, 0
+    je finish
+    div ebx
+    cmp edx, 1
+    je finish
+    push eax
+    call function
+    add esp, 4
+finish:
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+global CMAIN
+CMAIN:
+    GET_UDEC 4, eax                 ;get x
+    push eax
+    call function
+    add esp, 4
+    PRINT_UDEC 4, edx
+    xor eax, eax
+    ret

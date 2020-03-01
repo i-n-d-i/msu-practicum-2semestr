@@ -1,0 +1,54 @@
+%include "io.inc"
+;вернуть k такое, что 3^k = x, и -1, если такого целого числа нет
+section .text
+degree:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push edx
+    mov eax, [ebp + 8]               ;данное число
+    
+    cmp eax, 1
+    jne A
+    mov dword [ebp + 8], 0
+    jmp finish
+    
+A:  mov edx, 0
+    mov ebx, 3
+    div ebx
+    
+    cmp edx, 0
+    je B
+    mov dword [ebp + 8], -1
+    jmp finish
+    
+B:  push eax
+    call degree      
+    pop eax
+    
+    cmp eax, -1
+    jne C
+    mov dword [ebp + 8], -1
+    jmp finish
+    
+C:  inc eax
+    mov [ebp + 8], eax
+    
+finish:
+    pop edx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    sub esp, 4
+    GET_UDEC 4, [esp]
+    call degree
+    PRINT_DEC 4, [esp]
+    add esp, 4
+    xor eax, eax
+    ret

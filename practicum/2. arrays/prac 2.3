@@ -1,0 +1,42 @@
+%include "io.inc"
+;дано n<=100, далее n целых чисел. вывести максимальное среди отрицательных чисел
+;гарантируется, что хотя бы одно такое число есть
+section .bss
+    n resb 1
+    a resd 100
+    
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [n]                         ;get n
+    mov ebx, 0
+    movzx ecx, byte [n]                     ;ecx = n
+L:  GET_DEC 4, [a + 4 * ebx]                ;считывание массива
+    inc ebx                                
+    loop L
+    dec ebx                                 ;ebx = n - 1    
+M:  mov eax, [a + 4 * ebx]                  
+    cmp eax, 0
+    jl first_max                            ;if(eax < 0)   goto first_max
+    dec ebx
+    jmp M
+first_max:  
+    mov edx, [a + 4 * ebx]                  ;max = a[i]
+    cmp ebx, 0
+    je finish                               ;if(ebx == 0)   goto finish
+    dec ebx    
+compare:
+    mov eax, [a + 4 * ebx]
+    cmp eax, 0
+    jge K                                   ;if(eax >= 0)    goto K
+    cmp eax, edx
+    jle K                                   ;if(eax <= max)  goto K
+new_max:
+    mov edx, [a + 4 * ebx]
+K:  dec ebx
+    cmp ebx, 0
+    jge compare                             ;if(ebx >= 0)    goto compare
+finish:
+    PRINT_DEC 4, edx                 
+    xor eax, eax
+    ret

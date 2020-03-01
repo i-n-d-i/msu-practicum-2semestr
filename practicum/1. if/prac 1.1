@@ -1,0 +1,12 @@
+%include "io.inc"
+;дано число n, 0 <= n <= 250. вывести куб этого числа
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, eax    ;get n
+    mov ebx, eax       
+    mul ebx            ;edx:eax = eax * ebx
+    mul ebx            ;edx:eax = eax * ebx
+    PRINT_UDEC 4, eax           
+    xor eax, eax
+    ret

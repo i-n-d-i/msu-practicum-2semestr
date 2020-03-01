@@ -1,0 +1,38 @@
+%include "io.inc"
+;дано n<=100, далее матрица n*n. вывести транспонированную матрицу
+section .bss
+    n resb 1
+    a resb 100 * 100
+
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [n]            ;get n
+    movzx ecx, byte [n]
+    mov eax, 0                 ;i
+.input1:
+    movzx edx, byte [n]
+    mov ebx, 0                 ;j
+.input:    
+    GET_DEC 1, [a + eax + ebx]
+    inc ebx
+    dec edx
+    jnz .input
+    add eax, ebx
+    dec ecx
+    jnz .input1
+    mov eax, 0                 ;i = 0
+    movzx ecx, byte [n]        
+L:  mov ebx, 0                 ;j = 0
+    movzx edx, byte [n]
+M:  PRINT_DEC 1, [a + eax + ebx]
+    PRINT_CHAR ' '
+    add ebx, ecx
+    dec edx
+    jnz M
+    NEWLINE
+    inc eax
+    cmp eax, ecx
+    jb L                       ;if(eax < ecx)    goto L
+    xor eax, eax
+    ret

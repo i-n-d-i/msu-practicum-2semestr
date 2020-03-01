@@ -1,0 +1,14 @@
+%include "io.inc"
+;найти сумму последовательности чисел, зак. 0
+section .text
+global CMAIN
+CMAIN:
+    mov bl, 0         ;sum = 0
+M:  GET_DEC 1, bh     ;get x
+    cmp bh, 0         
+    je L              ;if(bh == 0)  goto L
+    add bl, bh        ;bl = bl + bh
+    jmp M 
+L:  PRINT_DEC 1, bl
+    xor eax, eax
+    ret

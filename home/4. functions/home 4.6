@@ -1,0 +1,60 @@
+%include "io.inc"
+;написать и проверить функцию, возвращающую 1, если данная строка является 
+;палиндромом и 0, если не является
+section .bss
+    s resb 100
+
+section .text
+poly:
+    ;save registers
+    push ebp
+    mov ebp, esp
+    push ebx
+    push ecx
+    push edx
+    
+    ;ebx - string address, edx - length
+    mov ebx, [ebp + 8]
+    mov edx, 0
+A:  cmp byte [ebx + edx], 0
+    je B
+    inc edx
+    jmp A
+    
+    ;ecx = 0 points on first symbol 
+B:  mov ecx, 0
+    
+    ;edx = (length - 1) points on last symbol
+    dec edx
+    
+    ;compare symbols
+C:  cmp ecx, edx
+    jb D                                  ;if(ecx < edx)   goto D
+    jmp E
+D:  mov al, byte [ebx + ecx] 
+    cmp al, byte [ebx + edx]
+    jne F
+    inc ecx
+    dec edx
+    jmp C
+E:  mov dword [ebp + 8], 1
+    jmp G
+F:  mov dword [ebp + 8], 0
+
+    ;return registers, return function 
+G:  pop edx
+    pop ecx
+    pop ebx
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    GET_STRING s, 100
+    push dword s                         ;записываем указатель на начало строки в стек
+    call poly
+    PRINT_UDEC 4, [esp]
+    add esp, 4
+    xor eax, eax
+    ret

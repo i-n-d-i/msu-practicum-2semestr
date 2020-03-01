@@ -1,0 +1,19 @@
+%include "io.inc"
+;сумма чисел от 1 до 20
+section .text
+plus:
+    push ecx 
+    xor eax, eax                ;eax = 0
+    mov ecx, [esp + 8]          ;ecx = 20
+L:  add eax, ecx
+    loop L
+    pop ecx
+    ret
+global CMAIN
+CMAIN:
+    push dword 20               ;записать в стек число 20
+    call plus
+    add esp, 4                  ;очистить стек
+    PRINT_UDEC 4, eax               
+    xor eax, eax
+    ret

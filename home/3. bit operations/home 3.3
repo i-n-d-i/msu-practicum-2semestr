@@ -1,0 +1,12 @@
+%include "io.inc"
+;вывести в порядке убывания все числа вида 2^n - 1, помещающиеся в два байта
+section .text
+global CMAIN
+CMAIN:
+    mov ax, 65535
+K:  PRINT_UDEC 2, ax
+    PRINT_CHAR ' '
+    shr ax, 1                  ;ax = ax / 2
+    jnz K 
+    xor eax, eax
+    ret

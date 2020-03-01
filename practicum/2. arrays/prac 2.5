@@ -1,0 +1,47 @@
+%include "io.inc"
+;дано n <= 100, далее n целых чисел a1, a2 ... an. вывести числа  b1, b2 ... bn,
+;такие, что bi = ai + ai+1 +...+an
+section .bss
+    n resb 1
+    a resd 100
+    b resd 100
+    m resd 1
+    
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [n]                          ;get n
+    mov ebx, 0
+    movzx ecx, byte [n]                      ;ecx = n
+L:  GET_UDEC 4, [a + 4 * ebx]                ;считывание массива
+    inc ebx                                
+    loop L
+    mov ebx, 0
+K:  mov [m], ebx                             ;[m] = 0
+    movzx ecx, byte [n]
+    mov eax, [b + 4 * ebx]                   ;eax = b[0]
+M:  mov edx, [a + 4 * ebx]                   ;edx = a[0]
+    add eax, edx                             ;b[0] += a[i], i = 0,1,2...n-1
+    inc ebx   
+    loop M
+    mov ebx, [m]                             ;ebx = 0
+    mov [b + 4 * ebx], eax
+    movzx ecx, byte [n]
+    inc ebx
+    cmp ebx, ecx
+    je print1                                ;if(ebx == ecx)    goto print1
+    jmp K
+print1:
+    mov ebx, 0
+    movzx ecx, byte [n]
+print:
+    PRINT_UDEC 4, [b + 4 * ebx]
+    PRINT_CHAR ' '
+    inc ebx                                  ;ebx++
+    dec ecx                                  ;ecx--
+    jnz print                                ;if(ecx != 0)  goto print
+    xor eax, eax
+    ret    
+    
+    
+        

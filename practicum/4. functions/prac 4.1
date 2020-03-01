@@ -1,0 +1,37 @@
+%include "io.inc"
+;вернуть 1, если данное беззнаковое двухбайтовое число содержит в своей записи
+;цифру '1', и 0 иначе
+section .text
+digits:
+    push ebp
+    mov ebp, esp
+          
+    push ebx
+    push edx
+A:  cmp ax, 0
+    je B                     ;if(ax == 0)   goto B
+    mov dx, 0
+    mov bx, 10
+    div bx                   ;dx = dx:ax % bx       ax = ... / ...
+    cmp dx, 1
+    je M
+    jmp A
+    
+B:  mov ecx, 0               ;answer
+    jmp F         
+M:  mov ecx, 1               ;answer
+F:  pop edx
+    pop ebx
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    GET_UDEC 2, ax              ;get n
+    push ax
+    call digits
+    add esp, 2
+    PRINT_UDEC 4, ecx
+    xor eax, eax
+    ret

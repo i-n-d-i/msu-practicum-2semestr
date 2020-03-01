@@ -1,0 +1,44 @@
+%include "io.inc"
+;с помощью стека получить значение данного выражения в постфиксном виде. все числа
+;однозначные, применяются только операции +, -, *. примеры: 57+ -> 12, 23+6* -> 30
+;236+* -> 18
+section .text
+global CMAIN
+CMAIN:
+    mov ebp, esp
+    xor eax, eax         ;eax = 0
+    
+A:  GET_CHAR al
+    cmp al, ' '
+    je finish
+    
+    cmp al, '+'
+    jne B
+    pop eax
+    add dword [esp], eax
+    jmp A
+    
+B:  cmp al, '-'
+    jne C
+    pop eax
+    sub dword [esp], eax
+    jmp A
+    
+C:  cmp al, '*'
+    jne D
+    pop eax
+    pop ebx
+    mul bl
+    push eax
+    jmp A
+ 
+D:  sub al, '0'
+    push eax
+    jmp A
+    
+finish:    
+    PRINT_UDEC 4, [esp]
+    add esp, 4    
+    mov esp, ebp
+    xor eax, eax
+    ret

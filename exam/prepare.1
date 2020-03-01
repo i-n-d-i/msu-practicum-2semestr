@@ -1,0 +1,40 @@
+%include "io.inc"
+;дано число N в виде строки, состоящая из не более чем 20 цифр и 
+;оканчивающаяся точкой. вывести N + 1. 
+section .bss
+    a resb 20
+    b resb 21
+    
+section .text
+global CMAIN
+CMAIN:
+    mov eax, 0
+begin:
+    GET_CHAR [a + eax]
+    cmp byte [a + eax], '.'
+    je continue
+    inc eax
+    jmp begin
+continue:
+    cmp eax, 0
+    je A
+    dec eax
+    cmp byte [a + eax], '9'
+    jne B
+    mov byte [a + eax], '0'
+    jmp continue
+A:  cmp byte [a + eax], '.'
+    je finish
+    PRINT_CHAR '1'
+    jmp C
+B:  inc byte [a + eax]
+C:  mov eax, 0
+print:
+    cmp byte [a + eax], '.'
+    je finish
+    PRINT_CHAR [a + eax]
+    inc eax
+    jmp print
+finish:
+    xor eax, eax
+    ret

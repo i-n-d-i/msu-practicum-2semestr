@@ -1,0 +1,22 @@
+%include "io.inc"
+;восстановить число по его битам, записанным в массив
+section .bss
+    a resb 8
+section .text
+global CMAIN
+CMAIN:
+    mov al, 0                          ;n
+    mov ecx, 0
+L:  GET_UDEC 1, [a + ecx]
+    inc ecx                            ;ecx++
+    cmp ecx, 8
+    jne L                              ;if(ecx != 8)    goto L
+B:  mov ecx, 0
+M:  shl al, 1                          ;al = al * 2
+    or al, byte [a + ecx]              
+    inc ecx                            ;ecx++
+    cmp ecx, 8
+    jne M
+F:  PRINT_UDEC 1, al
+    xor eax, eax
+    ret

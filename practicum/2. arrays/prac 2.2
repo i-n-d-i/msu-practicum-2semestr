@@ -1,0 +1,43 @@
+%include "io.inc"
+;дано n<=100, далее n целых знаковых чисел. вывести этот массив, игнорируя 
+;все вхождения минимального элемента
+section .bss
+    n resb 1
+    a resd 100
+    
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 1, [n]                          ;get n
+    mov ebx, 0
+    movzx ecx, byte [n]                   
+    GET_DEC 4, [a + 4 * ebx]                 ;считывание первого элемента массива
+    mov edx, [a + 4 * ebx]                   ;min = a[0]
+    dec ecx
+find_min:  
+    inc ebx                                  ;ebx++
+    GET_DEC 4, [a + 4 * ebx]                 ;считывание остальных элементов массива
+    cmp [a + 4 * ebx], edx
+    jl new_min                               ;if a[i] < min    goto new_min
+    loop find_min
+    jmp M
+new_min: 
+    mov edx, [a + 4 * ebx]                                
+    loop find_min      
+M:  mov ebx, 0
+    movzx ecx, byte [n]
+compare:  
+    cmp edx, [a + 4 * ebx]
+    jne print                                 ;if(edx == a[i])  goto print
+    inc ebx
+    loop compare
+    jmp finish
+print: 
+    PRINT_UDEC 4, [a + 4 * ebx]
+    PRINT_CHAR ' '
+    inc ebx
+    dec ecx
+    jnz compare     
+finish: 
+    xor eax, eax
+    ret

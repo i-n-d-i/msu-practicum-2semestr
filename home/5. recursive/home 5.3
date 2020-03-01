@@ -1,0 +1,39 @@
+%include "io.inc"
+;вывести в обратном порядке все цифры, входящие в данную строку
+section .bss
+    s resb 100
+section .text
+rev:
+    push ebp
+    mov ebp, esp
+    push eax
+    mov eax, [ebp + 8]            ;начало массива
+    
+    cmp byte [eax], 0
+    je finish
+    
+    inc eax
+    push eax
+    call rev
+    add esp, 4
+    
+    cmp byte [eax], '0'
+    jb finish                     ; ...< '0'
+    cmp byte [eax], '9'          
+    ja finish                     ; ...> '9'
+    PRINT_CHAR [eax]
+    
+finish:
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+global CMAIN
+CMAIN:
+    GET_STRING s, 100
+    push dword s
+    call rev
+    add esp, 4
+    xor eax, eax
+    ret

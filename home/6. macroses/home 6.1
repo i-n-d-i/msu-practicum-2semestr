@@ -1,0 +1,21 @@
+%include "io.inc"
+;макрос min принимает два параметра(первый из которых регистр) и записывает в этот регистр
+;минимум из двух параметров. Например, min eax, [x] должен записать в eax минимум из eax 
+;и четырехбайтового числа по адресу x
+
+%macro min 2
+    cmp %2, %1
+    ja %%l                ;[x] > ecx
+    xchg %1, %2
+%%l: 
+    %endmacro
+
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx
+    GET_UDEC 4, edx
+    min ecx, edx
+    PRINT_UDEC 4, ecx
+    xor eax, eax
+    ret

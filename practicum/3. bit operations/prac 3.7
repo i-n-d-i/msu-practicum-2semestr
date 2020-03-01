@@ -1,0 +1,13 @@
+%include "io.inc"
+;не используя арифметических операций, найти 8х + х % 4, где 0 <= x <= 8000
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, ax        ;get x
+    mov bx, ax
+    shl ax, 3             ;x * 8
+    and bx, 3             ;x % 4
+    xor ax, bx            ;8x + x % 4
+    PRINT_UDEC 2,ax
+    xor eax, eax
+    ret

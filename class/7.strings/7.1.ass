@@ -1,0 +1,30 @@
+%include "io.inc"
+;проверить является ли строка сложением двух одинаковых подстрок
+;например, abbabb
+section .bss
+    s resb 100
+section .text
+global CMAIN
+CMAIN:
+    GET_STRING s, 100
+    mov al, 0
+    mov ecx, 100
+    mov edi, s
+    cld                      ;DF = 0 слева направо сравниваем
+    repne scasb
+    sub edi, s + 1           ;размер
+    test edi, 1              ;проверяем делится ли на 2
+    jnz .NO
+    shr edi, 1               ;делим на 2
+    mov ecx, edi
+    mov esi, s               ;первая половина строки
+    add edi, s               ;вторая половина строки
+    repe cmpsb
+    jne .NO
+    PRINT_STRING 'YES'
+    jmp finish
+.NO: 
+    PRINT_STRING 'NO'
+finish:    
+    xor eax, eax
+    ret

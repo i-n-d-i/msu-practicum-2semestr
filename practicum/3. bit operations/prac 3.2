@@ -1,0 +1,15 @@
+%include "io.inc"
+;вывести максимальную степень двойки, на которую делится данное двухбайтовое
+;безззнаковое ненулевое число
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 2, ax         ;get n
+    mov bx, 1
+A:  test ax, bx            ;ax % 2
+    jnz B
+    shl bx, 1              ;bx = bx * 2
+    jmp A
+B:  PRINT_UDEC 2, bx
+    xor eax, eax    
+    ret

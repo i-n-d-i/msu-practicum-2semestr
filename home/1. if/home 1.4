@@ -1,0 +1,22 @@
+%include "io.inc"
+;дано n, 1<= n <= 650.000, найти максимальную цифру числа
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, eax    ;get n
+    mov ebx, 0         ;max = 0
+    mov ecx, 10        ;ecx = 10
+M:  cmp eax, 9
+    jbe F              ;if(eax <= 9)  goto F
+    mov edx, 0          
+    div ecx            ;edx = edx:eax % ecx
+    cmp edx, ebx
+    jb M               ;if(edx < max)   goto M
+    mov ebx, edx       ;max = edx
+    jmp M        
+F:  cmp eax, ebx     
+    jb K               ;if(eax < max)  goto K
+    mov ebx, eax       ;max = eax
+K:  PRINT_UDEC 4, ebx 
+    xor eax, eax
+    ret

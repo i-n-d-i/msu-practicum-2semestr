@@ -1,0 +1,20 @@
+%include "io.inc"
+;дано n, далее n двухбайтовых б/зн чисел. вывести первые цифры этих чисел
+section .text
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ecx   ;get n
+    mov bx, 10        ;k = 10
+K:  GET_UDEC 2, ax    ;get x
+M:  cmp ax, 10       
+    jb L              ;if(ax < 10)   goto L
+    mov dx, 0         ;dx = 0
+    div bx            ;ax = dx:ax / bx
+    jmp M
+L:  PRINT_UDEC 2, ax
+    PRINT_CHAR ' '
+    dec ecx
+    je F
+    jmp K
+F:  xor eax, eax
+    ret

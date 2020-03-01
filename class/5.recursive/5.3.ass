@@ -1,0 +1,30 @@
+%include "io.inc"
+;найти факториал данного числа 
+section .text
+factorial:
+    push ebp              
+    mov ebp, esp
+    push edx
+    cmp ebx, 2                    
+    jae F                        ;if(n >= 2)   goto F
+    mov eax, 1                   
+    jmp finish               
+F:  dec ebx                      ;n--
+    call factorial
+    inc ebx                      ;n++
+    mul ebx                      ;edx:eax = eax * ebx
+finish:
+    pop edx
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    GET_UDEC 4, ebx              ;get n
+    push ebx
+    call factorial
+    PRINT_UDEC 4, eax
+    add esp, 4    
+    xor eax, eax
+    ret

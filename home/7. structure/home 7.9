@@ -1,0 +1,130 @@
+%include "io.inc"
+;написать нерекурсивную функцию, возвращающую к-во отрицательных элементов списка
+
+NULL equ 0
+heap_size equ 100
+
+struc node
+    elem resb 1
+    next resd 1
+endstruc
+
+section .bss
+    heap resb heap_size * node_size
+    heap_ptr resd 1
+    
+section .text
+;инициализация кучи
+init_heap:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push ecx
+    
+    mov dword [heap_ptr], heap
+    mov eax, [heap_ptr]
+    mov ecx, heap_size - 1
+L:  mov ebx, eax
+    add ebx, node_size
+    mov [eax + next], ebx
+    add eax, node_size
+    loop L
+    
+    mov [eax + next], dword NULL
+    
+    pop ecx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+;создать новое звено списка
+new:
+    push ebp
+    mov ebp, esp
+    push eax
+    
+    mov edi, [heap_ptr]
+    cmp edi, NULL
+    je .empty
+    mov eax, [edi + next]
+    mov [heap_ptr], eax
+    mov [edi + next], dword NULL
+    jmp .finish
+.empty:
+    PRINT_STRING 'HEAP IS EMPTY'
+.finish:
+    pop eax
+    mov ebp, esp
+    pop ebp
+    ret  
+
+;считать список    
+read_list:
+    push ebp
+    mov ebp, esp
+    push eax
+    push ebx
+    push edx
+    
+    mov eax, NULL
+    GET_DEC 1, bl
+    cmp bl, 0
+    je finish
+    call new
+    mov [edi + elem], bl
+    mov eax, edi
+    mov edx, eax
+K:  GET_DEC 1, bl
+    cmp bl, 0
+    je finish 
+    call new
+    cmp edi, NULL
+    jne .L
+    PRINT_STRING 'Can not create list'
+    jmp finish
+.L: mov [edi + elem], bl
+    mov ebx, edi
+    mov [edx + next], ebx
+    mov edx, ebx
+    jmp K
+finish:
+    pop edx
+    pop ebx
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+
+amount_of_neg:
+    push ebp
+    mov ebp, esp
+    push eax
+    
+    mov ebx, 0                      ;amount
+    mov eax, [ebp + 8]    
+J:  cmp eax, NULL
+    je FF
+    cmp byte [eax + elem], 0
+    jge not_neg                     ;>=   
+    inc ebx
+not_neg:
+    mov eax, [eax + next]
+    jmp J
+FF: pop eax
+    mov esp, ebp
+    pop ebp
+    ret
+    
+global CMAIN
+CMAIN:
+    call init_heap               
+    call read_list                 
+    push heap
+    call amount_of_neg
+    add esp, 4
+    PRINT_UDEC 4, ebx
+    xor eax, eax
+    ret

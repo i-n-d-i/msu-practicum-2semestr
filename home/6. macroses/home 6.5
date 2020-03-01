@@ -1,0 +1,38 @@
+%include "io.inc"
+;макрос rot должен циклически менять значения указанных параметров.
+;например, rot ax, bx должно давать тот же результат, что и xchg ax, bx;
+;rot ax, word [p], word [q] должно пересылать старое значение из ax в два байта 
+;по метке p, старое значение из p в q, старое значение из q в ax.
+
+%include "io.inc"
+
+%macro rot 0-*
+    %rep %0 - 1 
+        mov dx, %1
+        xchg dx, %2
+        mov %1, dx
+        %rotate -1
+    %endrep
+%endmacro
+
+section .data
+    w1 dw 1
+    w2 dw 2
+    w3 dw 3
+   
+section .text
+global CMAIN
+CMAIN:
+    mov ax, 0
+    PRINT_UDEC 2, ax
+    PRINT_UDEC 2, [w1]
+    PRINT_UDEC 2, [w2]
+    PRINT_UDEC 2, [w3]
+    rot ax, word [w1], word [w2], word [w3]
+    NEWLINE
+    PRINT_UDEC 2, ax
+    PRINT_UDEC 2, [w1]
+    PRINT_UDEC 2, [w2]
+    PRINT_UDEC 2, [w3]
+    xor eax, eax
+    ret

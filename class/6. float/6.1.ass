@@ -1,0 +1,19 @@
+%include "io.inc"
+;посчитать (a + b) * c
+section .data
+    a dd 3.7
+    b dd 4.3
+    c dd 2.5
+    x dd 0
+section .text
+global CMAIN
+CMAIN:
+    fld dword [a]
+    fld dword [b]
+    faddp                 
+    fld dword [c]        ;st0 = [c], st1 = [a] + [b]
+    fmulp
+    fistp dword [x] 
+    PRINT_UDEC 4, [x]
+    xor eax, eax
+    ret
